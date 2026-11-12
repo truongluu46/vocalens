@@ -1,5 +1,7 @@
 package com.luudev.vocalens.presentation.practice
 
+import com.luudev.vocalens.presentation.components.pondBackground
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,10 +49,10 @@ import com.luudev.vocalens.presentation.theme.VocaLensTheme
 import java.util.Locale
 import kotlin.math.roundToInt
 
-private val Blue = Color(0xFF2864FF)
-private val Ink = Color(0xFF071A33)
-private val Muted = Color(0xFF8192AD)
-private val Outline = Color(0xFFDFE7F3)
+private val Blue = KoiColors.Primary
+private val Ink = KoiColors.Ink
+private val Muted = KoiColors.Muted
+private val Outline = KoiColors.Outline
 
 @Composable
 fun PracticeScreen(
@@ -67,7 +69,7 @@ fun PracticeScreen(
     onDismissDownloads: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier.fillMaxSize().background(Color(0xFFF7F9FB)).imePadding()) {
+    Column(modifier.fillMaxSize().pondBackground().imePadding()) {
         PracticeTopBar(onBackClick, onDownloadsClick)
         LazyColumn(Modifier.widthIn(max = 600.dp).fillMaxWidth().weight(1f).align(Alignment.CenterHorizontally),
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
@@ -85,8 +87,8 @@ fun PracticeScreen(
                             label = { Text(filterLabel(filter), fontSize = 10.sp, fontWeight = FontWeight.Medium) },
                             shape = RoundedCornerShape(20.dp),
                             border = BorderStroke(1.dp, if (selected) Blue else Outline),
-                            colors = FilterChipDefaults.filterChipColors(containerColor = Color.White,
-                                selectedContainerColor = Blue, selectedLabelColor = Color.White, labelColor = Color(0xFF617795)))
+                            colors = FilterChipDefaults.filterChipColors(containerColor = KoiColors.Surface,
+                                selectedContainerColor = Blue, selectedLabelColor = Color.White, labelColor = KoiColors.Muted))
                     }
                 }
             }
@@ -108,7 +110,7 @@ fun PracticeScreen(
                 Column(Modifier.fillMaxWidth().padding(vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     AppIcon(AppGlyph.Headphones, Muted, Modifier.size(35.dp))
                     Spacer(Modifier.height(15.dp))
-                    Text(stringResource(R.string.practice_no_results), color = Ink, fontSize = 15.sp)
+                    Text(stringResource(if (uiState.storageError) R.string.local_storage_error else R.string.practice_no_results), color = Ink, fontSize = 15.sp)
                     Spacer(Modifier.height(8.dp))
                     Text(stringResource(R.string.practice_no_results_body), color = Muted, fontSize = 12.sp, textAlign = TextAlign.Center)
                 }
@@ -116,7 +118,7 @@ fun PracticeScreen(
         }
     }
     uiState.selectedLesson?.let { lesson ->
-        AlertDialog(onDismissRequest = onDismissLesson, containerColor = Color.White,
+        AlertDialog(onDismissRequest = onDismissLesson, containerColor = KoiColors.Surface,
             title = { Text(lesson.title, color = Ink) },
             text = {
                 Column {
@@ -134,7 +136,7 @@ fun PracticeScreen(
     }
     if (uiState.showDownloads) AlertDialog(onDismissRequest = onDismissDownloads,
         title = { Text(stringResource(R.string.practice_downloads)) },
-        text = { Text(stringResource(R.string.practice_downloads_empty)) }, containerColor = Color.White,
+        text = { Text(stringResource(R.string.practice_downloads_empty)) }, containerColor = KoiColors.Surface,
         confirmButton = { TextButton(onClick = onDismissDownloads) { Text(stringResource(R.string.practice_close), color = Blue) } })
 }
 
@@ -160,11 +162,11 @@ private fun PracticeTopBar(onBackClick: () -> Unit, onDownloadsClick: () -> Unit
 
 @Composable
 private fun MediaTypeSelector(selectedType: PracticeMediaType, onSelected: (PracticeMediaType) -> Unit) {
-    Row(Modifier.fillMaxWidth().height(46.dp).background(Color(0xFFE8EEF7), RoundedCornerShape(14.dp))
+    Row(Modifier.fillMaxWidth().height(46.dp).background(KoiColors.SoftWater, RoundedCornerShape(14.dp))
         .padding(4.dp).selectableGroup()) {
         PracticeMediaType.entries.forEach { type ->
             val selected = selectedType == type
-            val color = if (selected) Blue else Color(0xFF647A99)
+            val color = if (selected) Blue else KoiColors.Muted
             Row(Modifier.weight(1f).fillMaxHeight()
                 .then(if (selected) Modifier.shadow(4.dp, RoundedCornerShape(11.dp)) else Modifier)
                 .background(if (selected) Color.White else Color.Transparent, RoundedCornerShape(11.dp))
@@ -191,8 +193,8 @@ private fun PracticeSearch(query: String, duration: PracticeDuration, onQueryCha
         trailingIcon = {
             Box {
                 IconButton(onClick = { showDuration = true }) {
-                    Box(Modifier.size(34.dp).background(if (duration == PracticeDuration.All) Color(0xFFEFF6FF)
-                        else Color(0xFFDCEAFF), RoundedCornerShape(11.dp)), contentAlignment = Alignment.Center) {
+                    Box(Modifier.size(34.dp).background(if (duration == PracticeDuration.All) KoiColors.Mint
+                        else KoiColors.SoftWater, RoundedCornerShape(11.dp)), contentAlignment = Alignment.Center) {
                         AppIcon(AppGlyph.Sort, Blue, Modifier.size(18.dp), stringResource(R.string.practice_duration_filter))
                     }
                 }
@@ -207,8 +209,8 @@ private fun PracticeSearch(query: String, duration: PracticeDuration, onQueryCha
                     }
                 }
             }
-        }, colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White, focusedBorderColor = Blue, unfocusedBorderColor = Outline, cursorColor = Blue))
+        }, colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = KoiColors.Surface,
+            unfocusedContainerColor = KoiColors.Surface, focusedBorderColor = Blue, unfocusedBorderColor = Outline, cursorColor = Blue))
 }
 
 @Composable
@@ -236,7 +238,7 @@ private fun FeaturedLesson(lesson: PracticeLesson, onClick: () -> Unit) {
                 Spacer(Modifier.height(10.dp))
                 Button(onClick = onClick, shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.height(34.dp), contentPadding = PaddingValues(horizontal = 12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Blue)) {
+                    colors = ButtonDefaults.buttonColors(containerColor = KoiColors.Surface, contentColor = Blue)) {
                     AppIcon(AppGlyph.Play, Blue, Modifier.size(14.dp))
                     Spacer(Modifier.width(6.dp))
                     Text(stringResource(R.string.practice_start), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
@@ -250,7 +252,7 @@ private fun FeaturedLesson(lesson: PracticeLesson, onClick: () -> Unit) {
 private fun LessonCard(lesson: PracticeLesson, onClick: () -> Unit) {
     val description = stringResource(R.string.practice_open_lesson, lesson.title)
     Surface(onClick = onClick, modifier = Modifier.fillMaxWidth().semantics { contentDescription = description },
-        shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, Outline)) {
+        shape = RoundedCornerShape(18.dp), color = KoiColors.Surface, border = BorderStroke(1.dp, Outline)) {
         Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(105.dp, 82.dp).clip(RoundedCornerShape(12.dp))) {
                 Image(painterResource(artwork(lesson.artworkKey)), null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
@@ -276,7 +278,7 @@ private fun LessonCard(lesson: PracticeLesson, onClick: () -> Unit) {
                 }
                 Spacer(Modifier.height(7.dp))
                 LinearProgressIndicator(progress = { lesson.progress }, modifier = Modifier.fillMaxWidth().height(3.dp),
-                    color = Color(0xFF3479FF), trackColor = Color(0xFFE8EEF7), strokeCap = StrokeCap.Round,
+                    color = KoiColors.Primary, trackColor = KoiColors.SoftWater, strokeCap = StrokeCap.Round,
                     gapSize = 0.dp, drawStopIndicator = {})
             }
         }
@@ -287,7 +289,7 @@ private fun LessonCard(lesson: PracticeLesson, onClick: () -> Unit) {
 private fun DifficultyBadge(difficulty: LessonDifficulty) {
     val (background, foreground) = when (difficulty) {
         LessonDifficulty.Easy -> Color(0xFFD2FAF4) to Color(0xFF00A99C)
-        LessonDifficulty.Intermediate -> Color(0xFFEDE7FF) to Color(0xFF8642FF)
+        LessonDifficulty.Intermediate -> KoiColors.SoftOrange to KoiColors.OrangeInk
         LessonDifficulty.Hard -> Color(0xFFFFF1C2) to Color(0xFFCA8B11)
     }
     Text(difficultyLabel(difficulty), color = foreground, fontSize = 8.sp,
@@ -329,11 +331,7 @@ private fun durationLabel(seconds: Int) = String.format(Locale.ROOT, "%02d:%02d"
 @Preview(showBackground = true, widthDp = 320, heightDp = 560)
 @Composable
 private fun PracticeScreenPreview() {
-    val featured = PracticeLesson("sample", "Daily English: Small Talk", "Giao tiếp hằng ngày", PracticeMediaType.Video,
-        LessonDifficulty.Easy, 600, 0f, 98, 4, "student", isFeatured = true)
-    val lesson = PracticeLesson("cafe", "Giao tiếp tại quán cà phê", "Giao tiếp hằng ngày", PracticeMediaType.Video,
-        LessonDifficulty.Easy, 504, 0.65f, 95, 3, "cafe")
     VocaLensTheme(darkTheme = false, dynamicColor = false) {
-        PracticeScreen(PracticeUiState(featuredLesson = featured, lessons = listOf(lesson)), {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+        PracticeScreen(PracticeUiState(), {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
     }
 }

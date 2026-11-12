@@ -1,7 +1,8 @@
 package com.luudev.vocalens.domain.repository
 
 import com.luudev.vocalens.domain.model.Dashboard
+import kotlinx.coroutines.flow.Flow
 
 interface DashboardRepository {
-    fun getDashboard(): Dashboard
+    fun observeDashboard(userId: String): Flow<Dashboard>
 }

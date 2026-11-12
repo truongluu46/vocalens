@@ -1,16 +1,18 @@
 package com.luudev.vocalens.domain.model
 
 data class Dashboard(
-    val learnerName: String,
-    val initials: String,
-    val streakDays: Int,
-    val completedWords: Int,
-    val targetWords: Int,
-    val studyMinutes: Int,
-    val pendingWords: Int,
-    val courseProgress: Float,
-    val recentActivityMinutes: Int,
-    val earnedXp: Int
+    val learnerName: String = "",
+    val initials: String = "VL",
+    val streakDays: Int = 0,
+    val completedWords: Int = 0,
+    val targetWords: Int = 25,
+    val studyMinutes: Int = 0,
+    val pendingWords: Int = 0,
+    val courseProgress: Float = 0f,
+    val recentActivityMinutes: Int = 0,
+    val earnedXp: Int = 0,
+    val continuedLessonTitle: String? = null,
+    val hasRecentActivity: Boolean = false
 ) {
     val dailyProgress: Float
         get() = if (targetWords > 0) (completedWords.toFloat() / targetWords).coerceIn(0f, 1f) else 0f

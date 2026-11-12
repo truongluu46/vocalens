@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="local_storage_error">Không thể đọc hoặc lưu dữ liệu. Vui lòng thử lại.</string>
+    <string name="local_storage_retry">Thử lại</string>
+</resources>

@@ -3,15 +3,15 @@ package com.luudev.vocalens.domain.model
 import java.util.Locale
 
 data class UserProfile(
-    val fullName: String,
-    val email: String,
+    val fullName: String = "",
+    val email: String = "",
     val dailyGoal: Int = 25,
     val reminderEnabled: Boolean = true,
     val soundEnabled: Boolean = true,
-    val wordsLearned: Int = 248,
-    val streakDays: Int = 7,
-    val totalXp: Int = 1240,
-    val wordsToday: Int = 17
+    val wordsLearned: Int = 0,
+    val streakDays: Int = 0,
+    val totalXp: Int = 0,
+    val wordsToday: Int = 0
 ) {
     val initials: String get() = fullName.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
         .takeLast(2).joinToString("") { it.take(1) }.uppercase(Locale.ROOT).ifEmpty { "VL" }

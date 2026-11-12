@@ -1,5 +1,6 @@
 package com.luudev.vocalens.presentation.components
 
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -28,8 +29,8 @@ import com.luudev.vocalens.R
 fun BrandHeader(modifier: Modifier = Modifier) {
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(52.dp).shadow(12.dp, RoundedCornerShape(18.dp),
-            spotColor = Color(0xFF09A9BB)).background(
-            Brush.linearGradient(listOf(Color(0xFF2877ED), Color(0xFF06B8B2))),
+            spotColor = KoiColors.Water).background(
+            Brush.linearGradient(listOf(KoiColors.Primary, KoiColors.Water)),
             RoundedCornerShape(18.dp)), contentAlignment = Alignment.Center) {
             Canvas(Modifier.size(30.dp)) {
                 scale(size.width / 24f, size.height / 24f, pivot = Offset.Zero) {
@@ -47,12 +48,12 @@ fun BrandHeader(modifier: Modifier = Modifier) {
         }
         Spacer(Modifier.height(13.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.welcome_brand), color = Color(0xFF071A33),
+            Text(stringResource(R.string.welcome_brand), color = KoiColors.Ink,
                 fontSize = 23.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.7).sp)
             Spacer(Modifier.width(4.dp))
-            Text(stringResource(R.string.welcome_ai), color = Color(0xFF2864FF), fontSize = 11.sp,
+            Text(stringResource(R.string.welcome_ai), color = KoiColors.Primary, fontSize = 11.sp,
                 fontWeight = FontWeight.Bold, modifier = Modifier
-                    .background(Color(0xFFDCE9FF), RoundedCornerShape(4.dp))
+                    .background(KoiColors.SoftWater, RoundedCornerShape(4.dp))
                     .padding(horizontal = 3.dp, vertical = 1.dp))
         }
     }

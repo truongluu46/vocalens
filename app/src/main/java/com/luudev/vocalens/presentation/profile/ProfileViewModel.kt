@@ -4,6 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import com.luudev.vocalens.domain.model.UserProfile
 import com.luudev.vocalens.domain.usecase.GetProfile
 import com.luudev.vocalens.domain.usecase.ProfileValidation
@@ -12,17 +16,37 @@ import com.luudev.vocalens.domain.usecase.SaveProfile
 enum class ProfileDialog { EditInfo, EditGoal, Statistics, Settings, ReminderInfo, Logout }
 
 data class ProfileUiState(
-    val profile: UserProfile,
+    val profile: UserProfile = UserProfile(),
     val dialog: ProfileDialog? = null,
     val draftName: String = "",
     val draftEmail: String = "",
     val draftGoal: Int = 25,
-    val validation: ProfileValidation = ProfileValidation(false, false, false)
+    val validation: ProfileValidation = ProfileValidation(false, false, false),
+    val isSaving: Boolean = false,
+    val storageError: Boolean = false
 )
 
 class ProfileViewModel(private val getProfile: GetProfile, private val saveProfile: SaveProfile) : ViewModel() {
-    var uiState by mutableStateOf(ProfileUiState(getProfile()))
+    var uiState by mutableStateOf(ProfileUiState())
         private set
+    private var owner: String? = null
+    private var observation: Job? = null
+    private var write: Job? = null
+
+    fun onUserChanged(uid: String?) {
+        if (uid == owner) return
+        observation?.cancel()
+        write?.cancel()
+        owner = uid
+        uiState = ProfileUiState()
+        if (uid == null) return
+        observation = viewModelScope.launch {
+            try {
+                getProfile(uid).collect { if (owner == uid) uiState = uiState.copy(profile = it, storageError = false) }
+            } catch (error: CancellationException) { throw error }
+            catch (error: Exception) { if (owner == uid) uiState = uiState.copy(storageError = true) }
+        }
+    }
 
     fun onOpenDialog(dialog: ProfileDialog) {
         uiState = uiState.copy(dialog = dialog, draftName = uiState.profile.fullName,
@@ -42,26 +66,35 @@ class ProfileViewModel(private val getProfile: GetProfile, private val saveProfi
     }
 
     fun onSaveInfo() {
-        val result = saveProfile(uiState.profile.copy(fullName = uiState.draftName, email = uiState.draftEmail))
-        uiState = uiState.copy(validation = result)
-        if (result.isValid) refreshProfile(closeDialog = true)
+        persist(uiState.profile.copy(fullName = uiState.draftName), closeDialog = true)
     }
 
     fun onSaveGoal() {
-        val result = saveProfile(uiState.profile.copy(dailyGoal = uiState.draftGoal))
-        uiState = uiState.copy(validation = result)
-        if (result.isValid) refreshProfile(closeDialog = true)
+        persist(uiState.profile.copy(dailyGoal = uiState.draftGoal), closeDialog = true)
     }
 
     fun onReminderChanged(enabled: Boolean) {
-        if (saveProfile(uiState.profile.copy(reminderEnabled = enabled)).isValid) refreshProfile()
+        persist(uiState.profile.copy(reminderEnabled = enabled))
     }
 
     fun onSoundChanged(enabled: Boolean) {
-        if (saveProfile(uiState.profile.copy(soundEnabled = enabled)).isValid) refreshProfile()
+        persist(uiState.profile.copy(soundEnabled = enabled))
     }
 
-    private fun refreshProfile(closeDialog: Boolean = false) {
-        uiState = uiState.copy(profile = getProfile(), dialog = if (closeDialog) null else uiState.dialog)
+    fun onStorageErrorDismissed() { uiState = uiState.copy(storageError = false) }
+
+    private fun persist(profile: UserProfile, closeDialog: Boolean = false) {
+        val uid = owner ?: return
+        if (uiState.isSaving) return
+        uiState = uiState.copy(isSaving = true, storageError = false)
+        write = viewModelScope.launch {
+            try {
+                val result = saveProfile(uid, profile)
+                if (owner == uid) uiState = uiState.copy(validation = result,
+                    dialog = if (closeDialog && result.isValid) null else uiState.dialog)
+            } catch (error: CancellationException) { throw error }
+            catch (error: Exception) { if (owner == uid) uiState = uiState.copy(storageError = true) }
+            finally { if (owner == uid) uiState = uiState.copy(isSaving = false) }
+        }
     }
 }

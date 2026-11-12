@@ -1,5 +1,7 @@
 package com.luudev.vocalens.presentation.profile
 
+import com.luudev.vocalens.presentation.components.pondBackground
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -34,10 +36,10 @@ import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.roundToInt
 
-private val Blue = Color(0xFF2864FF)
-private val Ink = Color(0xFF071A33)
-private val Muted = Color(0xFF8A9AB4)
-private val Outline = Color(0xFFE0E8F4)
+private val Blue = KoiColors.Primary
+private val Ink = KoiColors.Ink
+private val Muted = KoiColors.Muted
+private val Outline = KoiColors.Outline
 
 @Composable
 fun ProfileScreen(
@@ -55,9 +57,10 @@ fun ProfileScreen(
     modifier: Modifier = Modifier
 ) {
     val profile = uiState.profile
-    LazyColumn(modifier.fillMaxSize().background(Color(0xFFF7F9FB)),
+    LazyColumn(modifier.fillMaxSize().pondBackground(),
         contentPadding = PaddingValues(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { ProfileHero(profile, onOpenDialog) }
+        if (uiState.storageError) item { Text(stringResource(R.string.local_storage_error), color = MaterialTheme.colorScheme.error) }
         item {
             Column(Modifier.padding(horizontal = 18.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -73,9 +76,9 @@ fun ProfileScreen(
             Column(Modifier.padding(horizontal = 18.dp)) {
                 SectionLabel(stringResource(R.string.profile_account_section))
                 Spacer(Modifier.height(9.dp))
-                Surface(shape = RoundedCornerShape(18.dp), color = Color.White) {
+                Surface(shape = RoundedCornerShape(18.dp), color = KoiColors.Surface.copy(alpha = .96f)) {
                     Column {
-                        ProfileRow(AppGlyph.Edit, Blue, Color(0xFFDBE9FF),
+                        ProfileRow(AppGlyph.Edit, Blue, KoiColors.SoftWater,
                             stringResource(R.string.profile_edit_info), stringResource(R.string.profile_edit_info_caption),
                             onClick = { onOpenDialog(ProfileDialog.EditInfo) })
                         HorizontalDivider(color = Outline.copy(alpha = 0.65f))
@@ -101,9 +104,9 @@ fun ProfileScreen(
             Column(Modifier.padding(horizontal = 18.dp)) {
                 SectionLabel(stringResource(R.string.profile_app_section))
                 Spacer(Modifier.height(9.dp))
-                Surface(shape = RoundedCornerShape(18.dp), color = Color.White) {
+                Surface(shape = RoundedCornerShape(18.dp), color = KoiColors.Surface.copy(alpha = .96f)) {
                     Column {
-                        ProfileRow(AppGlyph.Settings, Color(0xFF853BFF), Color(0xFFEEE7FF),
+                        ProfileRow(AppGlyph.Settings, KoiColors.OrangeInk, KoiColors.SoftOrange,
                             stringResource(R.string.profile_settings), stringResource(R.string.profile_settings_caption),
                             onClick = { onOpenDialog(ProfileDialog.Settings) })
                         HorizontalDivider(color = Outline.copy(alpha = 0.65f))
@@ -129,11 +132,11 @@ fun ProfileScreen(
 private fun ProfileHero(profile: UserProfile, onOpenDialog: (ProfileDialog) -> Unit) {
     Column {
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
-            .background(Brush.linearGradient(listOf(Color(0xFF2347BC), Color(0xFF245FEB), Color(0xFF09A89B))))
+            .pondBackground(prominent = true)
             .padding(horizontal = 18.dp).padding(top = 12.dp, bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(36.dp).background(Brush.linearGradient(listOf(Color(0xFF2B85EF), Color(0xFF08B7AC))),
+                Box(Modifier.size(36.dp).background(Brush.linearGradient(listOf(KoiColors.Primary, KoiColors.Water)),
                     RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
                     AppIcon(AppGlyph.Sparkles, Color.White, Modifier.size(23.dp))
                 }
@@ -149,7 +152,7 @@ private fun ProfileHero(profile: UserProfile, onOpenDialog: (ProfileDialog) -> U
                 }
             }
             Spacer(Modifier.height(12.dp))
-            Surface(onClick = { onOpenDialog(ProfileDialog.EditInfo) }, shape = RoundedCornerShape(26.dp),
+            Surface(onClick = { onOpenDialog(ProfileDialog.EditInfo) }, shape = androidx.compose.foundation.shape.CircleShape,
                 modifier = Modifier.size(80.dp), color = Color.White) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(profile.initials, color = Blue, fontSize = 26.sp, fontWeight = FontWeight.Bold)
@@ -162,7 +165,7 @@ private fun ProfileHero(profile: UserProfile, onOpenDialog: (ProfileDialog) -> U
             Spacer(Modifier.height(10.dp))
             Text(profile.fullName, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
             Spacer(Modifier.height(5.dp))
-            Text(profile.email, color = Color(0xFFDCEAFF), fontSize = 10.sp, textAlign = TextAlign.Center)
+            Text(profile.email, color = KoiColors.SoftWater, fontSize = 10.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height(10.dp))
             Row(Modifier.background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                 .padding(horizontal = 10.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -173,7 +176,7 @@ private fun ProfileHero(profile: UserProfile, onOpenDialog: (ProfileDialog) -> U
         }
         Surface(Modifier.padding(horizontal = 18.dp).offset(y = (-20).dp).fillMaxWidth()
             .shadow(12.dp, RoundedCornerShape(18.dp), spotColor = Color(0xFFB8C8D6).copy(alpha = 0.25f)),
-            color = Color.White, shape = RoundedCornerShape(18.dp), border = BorderStroke(1.dp, Outline)) {
+            color = KoiColors.Surface, shape = RoundedCornerShape(18.dp), border = BorderStroke(1.dp, Outline)) {
             Row(Modifier.height(IntrinsicSize.Min).padding(vertical = 15.dp)) {
                 StatColumn(profile.wordsLearned.toString(), stringResource(R.string.profile_words_learned), Modifier.weight(1f))
                 VerticalDivider(color = Outline)
@@ -196,9 +199,9 @@ private fun StatColumn(value: String, label: String, modifier: Modifier) {
 
 @Composable
 private fun GoalCard(profile: UserProfile) {
-    Surface(shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, Outline)) {
+    Surface(shape = RoundedCornerShape(18.dp), color = KoiColors.Surface, border = BorderStroke(1.dp, Outline)) {
         Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            ProfileIcon(AppGlyph.Target, Blue, Color(0xFFDBE9FF))
+            ProfileIcon(AppGlyph.Target, Blue, KoiColors.SoftWater)
             Spacer(Modifier.width(9.dp))
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.profile_daily_goal, profile.dailyGoal), color = Ink, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
@@ -206,7 +209,7 @@ private fun GoalCard(profile: UserProfile) {
                 Text(stringResource(R.string.profile_today_words, profile.wordsToday), color = Muted, fontSize = 8.sp)
                 Spacer(Modifier.height(6.dp))
                 LinearProgressIndicator(progress = { profile.dailyProgress }, modifier = Modifier.fillMaxWidth().height(5.dp),
-                    color = Color(0xFF3479FF), trackColor = Color(0xFFE8EEF7), strokeCap = StrokeCap.Round,
+                    color = KoiColors.Primary, trackColor = KoiColors.SoftWater, strokeCap = StrokeCap.Round,
                     gapSize = 0.dp, drawStopIndicator = {})
             }
             Spacer(Modifier.width(10.dp))
@@ -258,7 +261,7 @@ private fun ProfileDialogContent(dialog: ProfileDialog, state: ProfileUiState, o
         ProfileDialog.Logout -> R.string.profile_logout
     })
     val editing = dialog == ProfileDialog.EditInfo || dialog == ProfileDialog.EditGoal
-    AlertDialog(onDismissRequest = onDismiss, containerColor = Color.White, title = { Text(title, color = Ink) },
+    AlertDialog(onDismissRequest = onDismiss, containerColor = KoiColors.Surface, title = { Text(title, color = Ink) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 when (dialog) {
@@ -269,6 +272,7 @@ private fun ProfileDialogContent(dialog: ProfileDialog, state: ProfileUiState, o
                             isError = state.validation.invalidName,
                             supportingText = if (state.validation.invalidName) { { Text(stringResource(R.string.register_name_error)) } } else null)
                         OutlinedTextField(state.draftEmail, onEmailChange, singleLine = true,
+                            readOnly = true,
                             label = { Text(stringResource(R.string.profile_email_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             isError = state.validation.invalidEmail,
@@ -319,6 +323,6 @@ private fun formatNumber(value: Int) = NumberFormat.getIntegerInstance(Locale.fo
 @Composable
 private fun ProfileScreenPreview() {
     VocaLensTheme(darkTheme = false, dynamicColor = false) {
-        ProfileScreen(ProfileUiState(UserProfile("Nguyễn Minh Anh", "minhanh@email.com")), {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+        ProfileScreen(ProfileUiState(), {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
     }
 }

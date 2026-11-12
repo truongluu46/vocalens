@@ -27,7 +27,7 @@
     <string name="practice_open_lesson">Mở bài học %1$s</string>
     <string name="practice_downloads">Bài học tải xuống</string>
     <string name="practice_downloads_empty">Chưa có bài học tải xuống.</string>
-    <string name="practice_media_unavailable">Đây là bài học mẫu. Nội dung phát Video/Podcast chưa được kết nối.</string>
+    <string name="practice_media_unavailable">Trình phát Video/Podcast chưa được tích hợp.</string>
     <string name="practice_no_results">Không tìm thấy bài học phù hợp</string>
     <string name="practice_no_results_body">Thử tìm từ khác hoặc thay đổi bộ lọc.</string>
     <string name="practice_close">Đóng</string>

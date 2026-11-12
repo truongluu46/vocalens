@@ -8,10 +8,10 @@ data class ProfileValidation(val invalidName: Boolean, val invalidEmail: Boolean
 }
 
 class SaveProfile(private val repository: ProfileRepository) {
-    operator fun invoke(profile: UserProfile): ProfileValidation {
+    suspend operator fun invoke(userId: String, profile: UserProfile): ProfileValidation {
         val result = ProfileValidation(profile.fullName.isBlank(),
             !EMAIL.matches(profile.email.trim()), profile.dailyGoal !in 1..500)
-        if (result.isValid) repository.saveProfile(profile.copy(fullName = profile.fullName.trim(), email = profile.email.trim()))
+        if (result.isValid) repository.saveProfile(userId, profile.copy(fullName = profile.fullName.trim(), email = profile.email.trim()))
         return result
     }
 

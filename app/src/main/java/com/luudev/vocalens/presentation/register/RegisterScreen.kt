@@ -1,5 +1,7 @@
 package com.luudev.vocalens.presentation.register
 
+import com.luudev.vocalens.presentation.components.pondBackground
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -36,9 +38,9 @@ import com.luudev.vocalens.presentation.components.FormGlyph
 import com.luudev.vocalens.presentation.components.FormIcon
 import com.luudev.vocalens.presentation.theme.VocaLensTheme
 
-private val RegisterBlue = Color(0xFF2560EF)
-private val RegisterInk = Color(0xFF071A33)
-private val RegisterMuted = Color(0xFF7B8EA9)
+private val RegisterBlue = KoiColors.Primary
+private val RegisterInk = KoiColors.Ink
+private val RegisterMuted = KoiColors.Muted
 
 @Composable
 fun RegisterScreen(
@@ -66,7 +68,7 @@ fun RegisterScreen(
         focusManager.clearFocus()
         onCreateAccountClick()
     }
-    Box(modifier.fillMaxSize().background(Color(0xFFF7F9FB)).safeDrawingPadding().imePadding()) {
+    Box(modifier.fillMaxSize().pondBackground().safeDrawingPadding().imePadding()) {
         BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val viewportHeight = maxHeight
             Column(
@@ -190,9 +192,9 @@ private fun RegistrationField(
             isError = error != null,
             supportingText = error?.let { { Text(it) } },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.White, unfocusedContainerColor = Color.White,
-                errorContainerColor = Color.White, focusedBorderColor = RegisterBlue,
-                unfocusedBorderColor = Color(0xFFDFE7F2), cursorColor = RegisterBlue
+                focusedContainerColor = KoiColors.Surface, unfocusedContainerColor = KoiColors.Surface,
+                errorContainerColor = KoiColors.Surface, focusedBorderColor = RegisterBlue,
+                unfocusedBorderColor = KoiColors.Outline, cursorColor = RegisterBlue
             ),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
             keyboardActions = KeyboardActions(onDone = { onDone() })

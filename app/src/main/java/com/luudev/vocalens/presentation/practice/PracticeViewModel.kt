@@ -5,6 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import com.luudev.vocalens.domain.model.*
 import com.luudev.vocalens.domain.usecase.FilterPracticeLessons
 import com.luudev.vocalens.domain.usecase.GetPracticeLessons
@@ -18,15 +22,18 @@ data class PracticeUiState(
     val featuredLesson: PracticeLesson? = null,
     val lessons: List<PracticeLesson> = emptyList(),
     val selectedLesson: PracticeLesson? = null,
-    val showDownloads: Boolean = false
+    val showDownloads: Boolean = false,
+    val storageError: Boolean = false
 )
 
 class PracticeViewModel(
     private val savedStateHandle: SavedStateHandle,
-    getPracticeLessons: GetPracticeLessons,
+    private val getPracticeLessons: GetPracticeLessons,
     private val filterPracticeLessons: FilterPracticeLessons = FilterPracticeLessons()
 ) : ViewModel() {
-    private val allLessons = getPracticeLessons()
+    private var allLessons = emptyList<PracticeLesson>()
+    private var owner: String? = null
+    private var observation: Job? = null
     var uiState by mutableStateOf(PracticeUiState(
         mediaType = restoredEnum("practice_media", PracticeMediaType.Video),
         query = savedStateHandle["practice_query"] ?: "",
@@ -36,7 +43,28 @@ class PracticeViewModel(
     ))
         private set
 
-    init { refreshLessons() }
+    fun onUserChanged(uid: String?) {
+        if (uid == owner) return
+        observation?.cancel()
+        owner = uid
+        allLessons = emptyList()
+        val sameOwner = savedStateHandle.get<String>("practice_owner") == uid
+        if (!sameOwner) {
+            listOf("practice_media", "practice_query", "practice_filter", "practice_duration", "practice_sort").forEach { savedStateHandle.remove<Any>(it) }
+        }
+        savedStateHandle["practice_owner"] = uid
+        uiState = if (sameOwner) uiState.copy(featuredLesson = null, lessons = emptyList(), selectedLesson = null,
+            showDownloads = false, storageError = false) else PracticeUiState()
+        if (uid == null) return
+        observation = viewModelScope.launch {
+            try {
+                getPracticeLessons(uid).collect {
+                    if (owner == uid) { allLessons = it; uiState = uiState.copy(storageError = false); refreshLessons() }
+                }
+            } catch (error: CancellationException) { throw error }
+            catch (error: Exception) { if (owner == uid) uiState = uiState.copy(storageError = true) }
+        }
+    }
 
     fun onMediaTypeSelected(mediaType: PracticeMediaType) {
         savedStateHandle["practice_media"] = mediaType.name

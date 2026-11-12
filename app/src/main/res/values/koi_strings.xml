@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_pond_title">Một chút bình yên, một từ mới</string>
+    <string name="welcome_pond_caption">Khám phá thế giới cùng VocabLens</string>
+    <string name="home_pond_title">Nuôi dưỡng từng từ mới</string>
+    <string name="home_pond_caption">Mỗi ngày một chút, tiến bộ thật xa.</string>
+</resources>

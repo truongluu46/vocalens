@@ -1,5 +1,7 @@
 package com.luudev.vocalens.presentation.login
 
+import com.luudev.vocalens.presentation.components.pondBackground
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -34,9 +36,9 @@ import com.luudev.vocalens.presentation.components.BrandHeader
 import com.luudev.vocalens.presentation.components.messageResource
 import com.luudev.vocalens.presentation.theme.VocaLensTheme
 
-private val LoginBlue = Color(0xFF2560EF)
-private val LoginInk = Color(0xFF071A33)
-private val LoginMuted = Color(0xFF7B8EA9)
+private val LoginBlue = KoiColors.Primary
+private val LoginInk = KoiColors.Ink
+private val LoginMuted = KoiColors.Muted
 
 @Composable
 fun LoginScreen(
@@ -68,7 +70,7 @@ fun LoginScreen(
         onLoginClick()
     }
 
-    Box(modifier.fillMaxSize().background(Color(0xFFF7F9FB)).safeDrawingPadding().imePadding()) {
+    Box(modifier.fillMaxSize().pondBackground().safeDrawingPadding().imePadding()) {
         BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val viewportHeight = maxHeight
             Column(
@@ -188,11 +190,11 @@ private fun FieldHint(text: String) {
 
 @Composable
 private fun loginFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedContainerColor = Color.White,
-    unfocusedContainerColor = Color.White,
-    errorContainerColor = Color.White,
+    focusedContainerColor = KoiColors.Surface,
+    unfocusedContainerColor = KoiColors.Surface,
+    errorContainerColor = KoiColors.Surface,
     focusedBorderColor = LoginBlue,
-    unfocusedBorderColor = Color(0xFFDFE7F2),
+    unfocusedBorderColor = KoiColors.Outline,
     cursorColor = LoginBlue
 )
 

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="vocabulary_storage_error">Không thể đọc hoặc cập nhật sổ tay. Vui lòng mở lại ứng dụng và thử lại.</string>
     <string name="vocabulary_back">Quay lại trang chủ</string>
     <string name="vocabulary_sort">Sắp xếp từ vựng</string>
     <string name="vocabulary_sort_recent">Lưu gần đây</string>
     <string name="vocabulary_sort_alphabetical">Theo bảng chữ cái</string>
-    <string name="vocabulary_search">Tìm trong sổ tay…</string>
+    <string name="vocabulary_search">Tra cứu từ vựng tiếng Anh…</string>
     <string name="vocabulary_clear_search">Xóa nội dung tìm kiếm</string>
     <string name="vocabulary_all">Tất cả</string>
     <string name="vocabulary_objects">Đồ dùng</string>
@@ -29,4 +30,14 @@
     <string name="vocabulary_close_review">Đóng</string>
     <string name="vocabulary_voice_loading">Đang chuẩn bị giọng đọc. Vui lòng thử lại.</string>
     <string name="vocabulary_voice_unavailable">Thiết bị chưa có giọng đọc tiếng Anh khả dụng.</string>
+    <string name="vocabulary_lookup">Tra cứu từ vựng</string>
+    <string name="vocabulary_lookup_not_found">Không tìm thấy từ này. Hãy thử từ khác.</string>
+    <string name="vocabulary_lookup_network">Không thể tra cứu. Kiểm tra kết nối và nhấn tra cứu để thử lại.</string>
+    <string name="vocabulary_lookup_invalid">Dữ liệu từ điển không hợp lệ. Vui lòng thử lại.</string>
+    <string name="vocabulary_lookup_no_vi">Chưa có bản dịch tiếng Việt cho nghĩa này.</string>
+    <string name="vocabulary_lookup_save">Lưu vào sổ tay</string>
+    <string name="vocabulary_lookup_saved">Đã lưu</string>
+    <string name="vocabulary_lookup_source">Nguồn: Wiktionary</string>
+    <string name="vocabulary_accent_uk">Anh–Anh (UK)</string>
+    <string name="vocabulary_accent_us">Anh–Mỹ (US)</string>
 </resources>

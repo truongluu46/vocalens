@@ -1,5 +1,7 @@
 package com.luudev.vocalens.presentation.home
 
+import com.luudev.vocalens.presentation.components.pondBackground
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -15,9 +17,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -30,28 +34,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luudev.vocalens.presentation.components.AppGlyph
 import com.luudev.vocalens.presentation.components.AppIcon
+import com.luudev.vocalens.presentation.components.KoiPond
+import com.luudev.vocalens.presentation.components.KoiFeatureArtwork
 import com.luudev.vocalens.R
 import com.luudev.vocalens.domain.model.Dashboard
 import com.luudev.vocalens.presentation.theme.VocaLensTheme
 import kotlin.math.roundToInt
+import kotlin.math.cos
+import kotlin.math.sin
 
-private val Blue = Color(0xFF2864FF)
-private val Ink = Color(0xFF071A33)
-private val Muted = Color(0xFF8192AD)
-private val Teal = Color(0xFF00B8AC)
-private val Outline = Color(0xFFE4EAF3)
+private val Blue = KoiColors.Primary
+private val Ink = KoiColors.Ink
+private val Muted = KoiColors.Muted
+private val Teal = KoiColors.Water
+private val Outline = KoiColors.Outline
 
 @Composable
 fun HomeScreen(uiState: HomeUiState, onAction: (HomeAction) -> Unit,
     onDismissAction: () -> Unit, modifier: Modifier = Modifier) {
     val dashboard = uiState.dashboard
-    Box(modifier.fillMaxSize().background(Color(0xFFF7F9FB)), contentAlignment = Alignment.TopCenter) {
+    Box(modifier.fillMaxSize().pondBackground(), contentAlignment = Alignment.TopCenter) {
         LazyColumn(
             Modifier.widthIn(max = 600.dp).fillMaxSize(),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item { HomeHeader(dashboard, onAction) }
+            if (uiState.storageError) item { Text(stringResource(R.string.local_storage_error), color = MaterialTheme.colorScheme.error) }
+            item { PondBanner() }
             item { StreakCard(dashboard.streakDays) }
             item {
                 SectionTitle(stringResource(R.string.home_today), stringResource(R.string.home_view_progress)) {
@@ -65,14 +75,14 @@ fun HomeScreen(uiState: HomeUiState, onAction: (HomeAction) -> Unit,
                 Spacer(Modifier.height(12.dp))
                 LearningGrid(dashboard.pendingWords, onAction)
             }
-            item {
+            if (dashboard.continuedLessonTitle != null) item {
                 SectionTitle(stringResource(R.string.home_continue), stringResource(R.string.home_view_all)) {
                     onAction(HomeAction.Courses)
                 }
                 Spacer(Modifier.height(10.dp))
                 ContinueLearningCard(dashboard) { onAction(HomeAction.Courses) }
             }
-            item {
+            if (dashboard.hasRecentActivity) item {
                 SectionTitle(stringResource(R.string.home_recent))
                 Spacer(Modifier.height(12.dp))
                 RecentActivityCard(dashboard) { onAction(HomeAction.Listening) }
@@ -80,6 +90,23 @@ fun HomeScreen(uiState: HomeUiState, onAction: (HomeAction) -> Unit,
         }
     }
     uiState.selectedAction?.let { action -> HomeActionDialog(action, dashboard, onDismissAction) }
+}
+
+@Composable
+private fun PondBanner() {
+    Box(Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(24.dp))) {
+        KoiPond(Modifier.matchParentSize())
+        Box(Modifier.matchParentSize().background(Brush.horizontalGradient(listOf(
+            KoiColors.DeepWater.copy(alpha = 0.98f),
+            KoiColors.DeepWater.copy(alpha = 0.85f), Color.Transparent))))
+        Column(Modifier.align(Alignment.CenterStart).fillMaxWidth(0.65f).padding(18.dp)) {
+            Text(stringResource(R.string.home_pond_title), color = KoiColors.Surface,
+                fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(8.dp))
+            Text(stringResource(R.string.home_pond_caption), color = KoiColors.SoftWater,
+                fontSize = 11.sp, lineHeight = 17.sp)
+        }
+    }
 }
 
 @Composable
@@ -93,7 +120,7 @@ private fun HomeHeader(dashboard: Dashboard, onAction: (HomeAction) -> Unit) {
                 fontSize = 24.sp, letterSpacing = (-0.6).sp)
         }
         Surface(onClick = { onAction(HomeAction.Notifications) }, shape = RoundedCornerShape(14.dp),
-            color = Color.White, border = BorderStroke(1.dp, Outline), modifier = Modifier.size(42.dp)) {
+            color = KoiColors.Surface, border = BorderStroke(1.dp, Outline), modifier = Modifier.size(42.dp)) {
             Box(contentAlignment = Alignment.Center) {
                 AppIcon(AppGlyph.Bell, Ink, description = stringResource(R.string.home_notifications))
             }
@@ -113,33 +140,62 @@ private fun StreakCard(days: Int) {
     val description = stringResource(R.string.home_streak_accessibility, days)
     Column(Modifier.fillMaxWidth().shadow(12.dp, RoundedCornerShape(22.dp),
         spotColor = Blue.copy(alpha = 0.2f)).clip(RoundedCornerShape(22.dp))
-        .background(Brush.linearGradient(listOf(Color(0xFF2449E6), Color(0xFF2464EB), Color(0xFF0CA39A))))
+        .pondBackground(prominent = true)
         .padding(15.dp).semantics { contentDescription = description }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(42.dp).background(Color.White.copy(alpha = 0.16f), RoundedCornerShape(13.dp)),
                 contentAlignment = Alignment.Center) {
-                AppIcon(AppGlyph.Flame, Color(0xFFFFD740), Modifier.size(27.dp))
+                AppIcon(AppGlyph.Flame, KoiColors.Orange, Modifier.size(27.dp))
             }
             Spacer(Modifier.width(10.dp))
             Column {
                 Text(stringResource(R.string.home_streak, days), color = Color.White,
                     fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(5.dp))
-                Text(stringResource(R.string.home_streak_caption), color = Color(0xFFDCE8FF),
+                Text(stringResource(R.string.home_streak_caption), color = KoiColors.SoftWater,
                     fontSize = 10.sp, fontWeight = FontWeight.Medium)
             }
         }
         Spacer(Modifier.height(16.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             repeat(7) { index ->
-                Box(Modifier.size(28.dp).background(if (index < 6) Color(0xFFCBE1FF)
-                    else Color.White.copy(alpha = 0.14f), CircleShape), contentAlignment = Alignment.Center) {
-                    if (index < 6) AppIcon(AppGlyph.Check, Blue, Modifier.size(12.dp))
-                    else Text(stringResource(R.string.home_sunday), color = Color(0xFFA7E4EE),
-                        fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                }
+                StreakDayLeaf(completed = index < days.coerceIn(0, 7))
             }
         }
+    }
+}
+
+@Composable
+private fun StreakDayLeaf(completed: Boolean) {
+    Box(Modifier.size(30.dp), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.matchParentSize()) {
+            val inset = 2.dp.toPx()
+            val bounds = Rect(inset, inset, size.width - inset, size.height - inset)
+            val leafCenter = Offset(size.width * .5f, size.height * .5f)
+            // A radial notch and fine veins give the badge a recognizable lily-pad silhouette.
+            val leaf = Path().apply {
+                moveTo(leafCenter.x, leafCenter.y * .78f)
+                arcTo(bounds, -65f, 330f, forceMoveTo = false)
+                close()
+            }
+            drawPath(leaf, Brush.linearGradient(
+                if (completed) listOf(Color(0xFF90BA7F), KoiColors.Lily)
+                else listOf(Color(0xFF588E7B), Color(0xFF3F786D))
+            ))
+            drawPath(leaf, KoiColors.SoftWater.copy(alpha = if (completed) .5f else .2f),
+                style = Stroke(.7.dp.toPx()))
+            repeat(6) { vein ->
+                val angle = (vein * 45f) * Math.PI / 180.0
+                val direction = Offset(cos(angle).toFloat(), sin(angle).toFloat())
+                drawLine(KoiColors.Surface.copy(alpha = if (completed) .18f else .08f),
+                    leafCenter + direction * (bounds.width * .24f),
+                    leafCenter + direction * (bounds.width * .45f), .6.dp.toPx())
+            }
+        }
+        if (completed) AppIcon(AppGlyph.Check, KoiColors.Surface,
+            Modifier.offset(y = 1.dp).size(14.dp))
+        else Text(stringResource(R.string.home_sunday), color = KoiColors.SoftWater,
+            fontSize = 9.sp, fontWeight = FontWeight.Bold, modifier = Modifier.offset(y = 1.dp))
     }
 }
 
@@ -163,7 +219,7 @@ private fun DailyGoalCard(dashboard: Dashboard) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(progress = { dashboard.dailyProgress },
-                        modifier = Modifier.fillMaxSize(), color = Blue, trackColor = Color(0xFFDCE9FF),
+                        modifier = Modifier.fillMaxSize(), color = Blue, trackColor = KoiColors.SoftWater,
                         strokeWidth = 5.dp)
                     Text(stringResource(R.string.home_percent, (dashboard.dailyProgress * 100).roundToInt()),
                         color = Blue, fontSize = 10.sp, fontWeight = FontWeight.Bold)
@@ -193,34 +249,49 @@ private fun DailyGoalCard(dashboard: Dashboard) {
 
 @Composable
 private fun LearningGrid(pendingWords: Int, onAction: (HomeAction) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             LearningCard(stringResource(R.string.home_flashcards), stringResource(R.string.home_pending, pendingWords),
-                AppGlyph.Flashcard, Blue, Color(0xFFDBE9FF), Modifier.weight(1f)) { onAction(HomeAction.Flashcards) }
+                AppGlyph.Flashcard, 0, Modifier.weight(1f)) { onAction(HomeAction.Flashcards) }
             LearningCard(stringResource(R.string.home_camera), stringResource(R.string.home_camera_caption),
-                AppGlyph.Camera, Color(0xFF853BFF), Color(0xFFEDE7FF), Modifier.weight(1f)) { onAction(HomeAction.Camera) }
+                AppGlyph.Camera, 1, Modifier.weight(1f)) { onAction(HomeAction.Camera) }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             LearningCard(stringResource(R.string.home_listening), stringResource(R.string.home_listening_caption),
-                AppGlyph.Headphones, Color(0xFFEE9400), Color(0xFFFFF3C7), Modifier.weight(1f)) { onAction(HomeAction.Listening) }
+                AppGlyph.Headphones, 2, Modifier.weight(1f)) { onAction(HomeAction.Listening) }
             LearningCard(stringResource(R.string.home_pronunciation), stringResource(R.string.home_pronunciation_caption),
-                AppGlyph.Mic, Color(0xFF00A99C), Color(0xFFC9FAF0), Modifier.weight(1f)) { onAction(HomeAction.Pronunciation) }
+                AppGlyph.Mic, 3, Modifier.weight(1f)) { onAction(HomeAction.Pronunciation) }
         }
     }
 }
 
 @Composable
-private fun LearningCard(title: String, subtitle: String, glyph: AppGlyph, tint: Color,
-    iconBackground: Color, modifier: Modifier, onClick: () -> Unit) {
-    DashboardCard(modifier, onClick) {
-        Column(Modifier.padding(13.dp)) {
-            IconTile(glyph, tint, iconBackground)
-            Spacer(Modifier.height(12.dp))
-            Text(title, color = Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(subtitle, color = Muted, fontSize = 9.sp, modifier = Modifier.weight(1f))
-                AppIcon(AppGlyph.Chevron, Muted, Modifier.size(13.dp))
+private fun LearningCard(title: String, subtitle: String, glyph: AppGlyph, artwork: Int,
+    modifier: Modifier, onClick: () -> Unit) {
+    Surface(onClick = onClick, modifier = modifier.fillMaxHeight(),
+        shape = RoundedCornerShape(24.dp), color = KoiColors.DeepWater,
+        border = BorderStroke(1.dp, KoiColors.Surface.copy(alpha = .85f))) {
+        Box(Modifier.fillMaxWidth().heightIn(min = 158.dp)) {
+            KoiFeatureArtwork(artwork, Modifier.matchParentSize())
+            Column(Modifier.fillMaxWidth().padding(16.dp).padding(bottom = 14.dp)) {
+                Surface(shape = RoundedCornerShape(16.dp), color = Color.Transparent,
+                    border = BorderStroke(1.dp, Color(0xFF9BE8D7).copy(alpha = .70f))) {
+                    Box(Modifier.size(44.dp).background(Brush.linearGradient(listOf(
+                        Color(0xFF72D4BE).copy(alpha = .50f), Color(0xFF3CA99C).copy(alpha = .24f)))),
+                        contentAlignment = Alignment.Center) {
+                        AppIcon(glyph, KoiColors.Surface, Modifier.size(26.dp))
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+                Text(title, color = KoiColors.Surface, fontSize = 17.sp, lineHeight = 22.sp,
+                    fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(6.dp))
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(subtitle, color = Color(0xFFC7E6DF), fontSize = 11.sp, lineHeight = 16.sp,
+                        modifier = Modifier.weight(1f))
+                    Spacer(Modifier.width(4.dp))
+                    AppIcon(AppGlyph.Chevron, KoiColors.Surface, Modifier.size(17.dp))
+                }
             }
         }
     }
@@ -235,7 +306,7 @@ private fun ContinueLearningCard(dashboard: Dashboard, onClick: () -> Unit) {
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.home_course_category), color = Blue, fontSize = 8.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
-                Text(stringResource(R.string.home_course_title, dashboard.pendingWords), color = Ink,
+                Text(dashboard.continuedLessonTitle.orEmpty(), color = Ink,
                     fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(9.dp))
                 ProgressLine(dashboard.courseProgress)
@@ -244,7 +315,7 @@ private fun ContinueLearningCard(dashboard: Dashboard, onClick: () -> Unit) {
                     color = Muted, fontSize = 8.sp)
             }
             Spacer(Modifier.width(10.dp))
-            Box(Modifier.size(28.dp).background(Color(0xFFDCEAFF), CircleShape), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(28.dp).background(KoiColors.SoftWater, CircleShape), contentAlignment = Alignment.Center) {
                 AppIcon(AppGlyph.Chevron, Blue, Modifier.size(18.dp))
             }
         }
@@ -262,7 +333,6 @@ private fun RecentActivityCard(dashboard: Dashboard, onClick: () -> Unit) {
                 Spacer(Modifier.height(6.dp))
                 Text(stringResource(R.string.home_activity_caption, dashboard.recentActivityMinutes), color = Muted, fontSize = 8.sp)
             }
-            Text(stringResource(R.string.home_xp, dashboard.earnedXp), color = Teal, fontSize = 10.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -272,9 +342,9 @@ private fun DashboardCard(modifier: Modifier = Modifier, onClick: (() -> Unit)? 
     content: @Composable () -> Unit) {
     val cardModifier = modifier.fillMaxWidth().shadow(7.dp, RoundedCornerShape(19.dp),
         ambientColor = Color(0xFFCBD5E1).copy(alpha = 0.15f), spotColor = Color(0xFFCBD5E1).copy(alpha = 0.15f))
-    if (onClick != null) Surface(onClick = onClick, modifier = cardModifier, color = Color.White,
+    if (onClick != null) Surface(onClick = onClick, modifier = cardModifier, color = KoiColors.Surface,
         shape = RoundedCornerShape(19.dp), border = BorderStroke(1.dp, Outline), content = content)
-    else Surface(modifier = cardModifier, color = Color.White, shape = RoundedCornerShape(19.dp),
+    else Surface(modifier = cardModifier, color = KoiColors.Surface, shape = RoundedCornerShape(19.dp),
         border = BorderStroke(1.dp, Outline), content = content)
 }
 
@@ -288,13 +358,13 @@ private fun IconTile(glyph: AppGlyph, tint: Color, background: Color) {
 @Composable
 private fun ProgressLine(progress: Float) {
     LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth().height(5.dp),
-        color = Color(0xFF3479FF), trackColor = Color(0xFFE8EEF7), strokeCap = StrokeCap.Round,
+        color = KoiColors.Primary, trackColor = KoiColors.SoftWater, strokeCap = StrokeCap.Round,
         gapSize = 0.dp, drawStopIndicator = {})
 }
 
 @Composable
 private fun HouseholdThumbnail(modifier: Modifier) {
-    Canvas(modifier.background(Color(0xFFFFB335))) {
+    Canvas(modifier.background(KoiColors.Orange)) {
         val w = size.width
         val h = size.height
         // A small original illustration of household objects in the reference's warm palette.
@@ -336,7 +406,7 @@ private fun HomeActionDialog(action: HomeAction, dashboard: Dashboard, onDismiss
         else -> stringResource(R.string.home_feature_pending, title)
     }
     AlertDialog(onDismissRequest = onDismiss, title = { Text(title, color = Ink) },
-        text = { Text(body) }, containerColor = Color.White,
+        text = { Text(body) }, containerColor = KoiColors.Surface,
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.home_close), color = Blue) } })
 }
 
@@ -345,6 +415,6 @@ private fun HomeActionDialog(action: HomeAction, dashboard: Dashboard, onDismiss
 @Composable
 private fun HomeScreenPreview() {
     VocaLensTheme(darkTheme = false, dynamicColor = false) {
-        HomeScreen(HomeUiState(Dashboard("Minh Anh", "MA", 7, 17, 25, 24, 12, 0.72f, 8, 20)), {}, {})
+        HomeScreen(HomeUiState(), {}, {})
     }
 }

@@ -1,5 +1,7 @@
 package com.luudev.vocalens.presentation.vocabulary
 
+import com.luudev.vocalens.presentation.components.pondBackground
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,6 +12,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.platform.LocalUriHandler
+import com.luudev.vocalens.domain.model.DictionaryError
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,10 +42,10 @@ import com.luudev.vocalens.presentation.components.AppGlyph
 import com.luudev.vocalens.presentation.components.AppIcon
 import com.luudev.vocalens.presentation.theme.VocaLensTheme
 
-private val Blue = Color(0xFF2864FF)
-private val Ink = Color(0xFF071A33)
-private val Muted = Color(0xFF8192AD)
-private val Outline = Color(0xFFDEE7F3)
+private val Blue = KoiColors.Primary
+private val Ink = KoiColors.Ink
+private val Muted = KoiColors.Muted
+private val Outline = KoiColors.Outline
 
 @Composable
 fun VocabularyScreen(
@@ -57,9 +62,11 @@ fun VocabularyScreen(
     onRevealMeaning: () -> Unit,
     onNextReviewWord: () -> Unit,
     onDismissReview: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLookup: () -> Unit = {},
+    onSaveLookupWord: (VocabularyWord) -> Unit = {}
 ) {
-    Column(modifier.fillMaxSize().background(Color(0xFFF7F9FB)).imePadding()) {
+    Column(modifier.fillMaxSize().pondBackground().imePadding()) {
         VocabularyTopBar(uiState.sort, onBackClick, onSortSelected)
         LazyColumn(Modifier.widthIn(max = 600.dp).fillMaxWidth().weight(1f).align(Alignment.CenterHorizontally),
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
@@ -77,11 +84,62 @@ fun VocabularyScreen(
                         }
                     } } else null,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { onLookup() }),
                     shape = RoundedCornerShape(15.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White, focusedBorderColor = Blue,
+                    colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = KoiColors.Surface,
+                        unfocusedContainerColor = KoiColors.Surface, focusedBorderColor = Blue,
                         unfocusedBorderColor = Outline, cursorColor = Blue)
                 )
+                Button(onClick = onLookup, enabled = uiState.query.isNotBlank() && !uiState.lookupLoading,
+                    modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.vocabulary_lookup))
+                }
+                if (uiState.lookupLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
+                uiState.lookupError?.let { error ->
+                    Text(stringResource(when (error) {
+                        DictionaryError.NotFound -> R.string.vocabulary_lookup_not_found
+                        DictionaryError.Network -> R.string.vocabulary_lookup_network
+                        DictionaryError.InvalidResponse -> R.string.vocabulary_lookup_invalid
+                    }), color = MaterialTheme.colorScheme.error)
+                }
+            }
+            items(uiState.lookupResults, key = { "lookup:${it.word.id}" }) { result ->
+                val word = result.word
+                val uriHandler = LocalUriHandler.current
+                Surface(color = KoiColors.Surface, shape = RoundedCornerShape(15.dp), border = BorderStroke(1.dp, Outline)) {
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(word.english, fontWeight = FontWeight.Bold, color = Ink, modifier = Modifier.weight(1f))
+                            IconButton(onClick = { onSpeakWord(word) }) {
+                                AppIcon(AppGlyph.Sound, Blue, description = stringResource(R.string.vocabulary_pronounce, word.english))
+                            }
+                        }
+                        result.accent?.let { accent ->
+                            Text(stringResource(if (accent == com.luudev.vocalens.domain.model.DictionaryAccent.British)
+                                R.string.vocabulary_accent_uk else R.string.vocabulary_accent_us), color = Blue)
+                        }
+                        Text(listOfNotNull(word.phonetic.takeIf { it.isNotBlank() }, word.partOfSpeech).joinToString(" · "), color = Muted)
+                        if (word.meaning.isNotBlank()) Text(word.meaning, color = Blue)
+                        else Text(stringResource(R.string.vocabulary_lookup_no_vi), color = Muted)
+                        Text(result.definition, color = Ink)
+                        word.exampleSentence?.let { Text(it, color = Muted) }
+                        val saved = uiState.savedWords.any { it.id == word.id }
+                        TextButton(onClick = { onSaveLookupWord(word) },
+                            enabled = !saved && word.meaning.isNotBlank() && uiState.savingWordId == null) {
+                            Text(stringResource(if (saved) R.string.vocabulary_lookup_saved else R.string.vocabulary_lookup_save))
+                        }
+                        Row {
+                            if (result.sourceUrl.startsWith("https://")) TextButton(onClick = { uriHandler.openUri(result.sourceUrl) }) {
+                                Text(stringResource(R.string.vocabulary_lookup_source))
+                            }
+                            if (result.licenseUrl.startsWith("https://")) TextButton(onClick = { uriHandler.openUri(result.licenseUrl) }) {
+                                Text(result.licenseName)
+                            }
+                        }
+                    }
+                }
+            }
+            item {
                 Spacer(Modifier.height(6.dp))
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -96,7 +154,7 @@ fun VocabularyScreen(
                         color = Ink, fontSize = 12.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
                     FilledTonalButton(onClick = onStartReview, enabled = uiState.visibleWords.isNotEmpty(),
                         shape = RoundedCornerShape(11.dp), contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
-                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color(0xFFDBE9FF), contentColor = Blue)) {
+                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = KoiColors.SoftWater, contentColor = Blue)) {
                         AppIcon(AppGlyph.Flashcard, Blue, Modifier.size(15.dp))
                         Spacer(Modifier.width(5.dp))
                         Text(stringResource(R.string.vocabulary_review), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
@@ -124,10 +182,10 @@ fun VocabularyScreen(
             text = { Text(stringResource(R.string.vocabulary_delete_body, word.english)) },
             confirmButton = { TextButton(onClick = onDeleteConfirmed) { Text(stringResource(R.string.vocabulary_delete_confirm)) } },
             dismissButton = { TextButton(onClick = onDeleteDismissed) { Text(stringResource(R.string.vocabulary_cancel)) } },
-            containerColor = Color.White)
+            containerColor = KoiColors.Surface)
     }
     uiState.reviewWords.getOrNull(uiState.reviewIndex)?.let { word ->
-        AlertDialog(onDismissRequest = onDismissReview, containerColor = Color.White,
+        AlertDialog(onDismissRequest = onDismissReview, containerColor = KoiColors.Surface,
             title = { Text(stringResource(R.string.vocabulary_review_index, uiState.reviewIndex + 1, uiState.reviewWords.size), fontSize = 17.sp) },
             text = {
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -186,8 +244,8 @@ private fun CategoryChip(label: String, selected: Boolean, onClick: () -> Unit) 
     FilterChip(selected, onClick, label = { Text(label, fontSize = 10.sp, fontWeight = FontWeight.Medium) },
         shape = RoundedCornerShape(20.dp),
         border = BorderStroke(1.dp, if (selected) Blue else Outline),
-        colors = FilterChipDefaults.filterChipColors(containerColor = Color.White,
-            selectedContainerColor = Blue, selectedLabelColor = Color.White, labelColor = Color(0xFF617795)))
+        colors = FilterChipDefaults.filterChipColors(containerColor = KoiColors.Surface,
+            selectedContainerColor = Blue, selectedLabelColor = Color.White, labelColor = KoiColors.Muted))
 }
 
 @Composable
@@ -199,7 +257,7 @@ private fun categoryLabel(category: VocabularyCategory) = stringResource(when (c
 
 @Composable
 private fun VocabularyWordCard(word: VocabularyWord, onSpeak: () -> Unit, onDelete: () -> Unit) {
-    Surface(Modifier.fillMaxWidth(), color = Color.White, shape = RoundedCornerShape(18.dp), border = BorderStroke(1.dp, Outline)) {
+    Surface(Modifier.fillMaxWidth(), color = KoiColors.Surface, shape = RoundedCornerShape(18.dp), border = BorderStroke(1.dp, Outline)) {
         Row(Modifier.padding(9.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(painterResource(if (word.id == "headphones") R.drawable.vocabulary_headphones else R.drawable.vocabulary_notebook),
                 contentDescription = null, contentScale = ContentScale.Crop,
@@ -213,7 +271,7 @@ private fun VocabularyWordCard(word: VocabularyWord, onSpeak: () -> Unit, onDele
                 Text(word.meaning, color = Blue, fontSize = 10.sp, fontWeight = FontWeight.Medium)
             }
             IconButton(onClick = onSpeak) {
-                Box(Modifier.size(32.dp).background(Color(0xFFEFF6FF), RoundedCornerShape(11.dp)), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(32.dp).background(KoiColors.Mint, RoundedCornerShape(11.dp)), contentAlignment = Alignment.Center) {
                     AppIcon(AppGlyph.Sound, Blue, Modifier.size(17.dp), stringResource(R.string.vocabulary_pronounce, word.english))
                 }
             }

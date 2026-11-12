@@ -1,5 +1,6 @@
 package com.luudev.vocalens.presentation.components
 
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -9,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 
-private val FormMuted = Color(0xFF7B8EA9)
+private val FormMuted = KoiColors.Muted
 enum class FormGlyph { Email, Lock, Eye, EyeOff, Person }
 
 @Composable

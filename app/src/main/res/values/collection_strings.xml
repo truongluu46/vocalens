@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="collection_tab_words">Kho từ</string>
+    <string name="collection_tab">Bộ sưu tập</string>
+    <string name="collection_create">Tạo bộ sưu tập</string>
+    <string name="collection_edit">Chỉnh sửa</string>
+    <string name="collection_delete">Xóa bộ sưu tập</string>
+    <string name="collection_name">Tên bộ sưu tập</string>
+    <string name="collection_description">Mô tả (không bắt buộc)</string>
+    <string name="collection_save">Lưu</string>
+    <string name="collection_cancel">Hủy</string>
+    <string name="collection_back">Quay lại</string>
+    <string name="collection_empty">Chưa có bộ sưu tập</string>
+    <string name="collection_empty_body">Gom các từ đã lưu theo chủ đề để học dễ dàng hơn.</string>
+    <string name="collection_word_count">%1$d từ vựng</string>
+    <string name="collection_manage_words">Chọn từ trong kho</string>
+    <string name="collection_no_words">Bộ sưu tập chưa có từ nào. Chọn từ trong kho cá nhân để bắt đầu.</string>
+    <string name="collection_no_saved_words">Kho từ đang trống. Hãy qua tab Kho từ, tra và lưu từ trước.</string>
+    <string name="collection_remove_word">Gỡ “%1$s” khỏi bộ sưu tập</string>
+    <string name="collection_remove">Gỡ khỏi nhóm</string>
+    <string name="collection_delete_body">Xóa bộ sưu tập “%1$s”? Các từ vẫn được giữ trong kho cá nhân.</string>
+    <string name="collection_validation">Tên phải có từ 1–120 ký tự, mô tả tối đa 1.000 ký tự.</string>
+    <string name="collection_error">Không thể đọc hoặc lưu bộ sưu tập. Vui lòng thử lại.</string>
+    <string name="collection_retry">Thử lại</string>
+    <string name="collection_working">Đang lưu…</string>
+    <string name="collection_picker_hint">Bỏ tích để gỡ từ khỏi nhóm. Từ vẫn được giữ trong kho cá nhân.</string>
+</resources>

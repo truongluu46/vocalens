@@ -15,7 +15,7 @@ data class PracticeLesson(
     val durationSeconds: Int,
     val progress: Float,
     val popularity: Int,
-    val publishedOrder: Int,
+    val publishedOrder: Long,
     val artworkKey: String,
     val isToeic: Boolean = false,
     val isFeatured: Boolean = false

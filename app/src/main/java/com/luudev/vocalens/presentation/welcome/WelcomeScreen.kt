@@ -1,5 +1,7 @@
 package com.luudev.vocalens.presentation.welcome
 
+import com.luudev.vocalens.presentation.components.pondBackground
+import com.luudev.vocalens.presentation.theme.KoiColors
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,15 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
@@ -31,21 +29,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luudev.vocalens.R
 import com.luudev.vocalens.presentation.theme.VocaLensTheme
+import com.luudev.vocalens.presentation.components.KoiPond
 import com.luudev.vocalens.presentation.components.BrandHeader
 
-private val Blue = Color(0xFF2864FF)
-private val Ink = Color(0xFF151D30)
-private val Muted = Color(0xFF7183A0)
+private val Blue = KoiColors.Primary
+private val Ink = KoiColors.Ink
+private val Muted = KoiColors.Muted
 
 @Composable
 fun WelcomeScreen(
     onStartClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier.fillMaxSize().background(
-        Brush.verticalGradient(listOf(Color(0xFFEFF6FF), Color(0xFFF7F9FB)))
-    )) {
-        AmbientBackground(Modifier.fillMaxSize())
+    Box(modifier.fillMaxSize().pondBackground()) {
         Column(
             modifier = Modifier.fillMaxSize().safeDrawingPadding()
                 .verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)
@@ -53,8 +49,8 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             BrandHeader()
-            Spacer(Modifier.height(26.dp))
-            PhoneIllustration(Modifier.widthIn(max = 350.dp).fillMaxWidth().height(264.dp))
+            Spacer(Modifier.height(24.dp))
+            PondIllustration(Modifier.widthIn(max = 400.dp).fillMaxWidth().height(292.dp))
             Spacer(Modifier.height(22.dp))
             Text(stringResource(R.string.welcome_eyebrow), color = Blue,
                 fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
@@ -75,7 +71,7 @@ fun WelcomeScreen(
                     .height(54.dp).shadow(14.dp, RoundedCornerShape(16.dp),
                         ambientColor = Blue.copy(alpha = 0.25f), spotColor = Blue.copy(alpha = 0.25f)),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2560EF))
+                colors = ButtonDefaults.buttonColors(containerColor = KoiColors.Primary)
             ) {
                 Text(stringResource(R.string.welcome_start), fontSize = 16.sp,
                     fontWeight = FontWeight.Bold, color = Color.White)
@@ -84,9 +80,9 @@ fun WelcomeScreen(
             }
             Spacer(Modifier.height(13.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                LineIcon(Glyph.Shield, Color(0xFF8FA2BD), Modifier.size(12.dp))
+                LineIcon(Glyph.Shield, KoiColors.Muted, Modifier.size(12.dp))
                 Spacer(Modifier.width(5.dp))
-                Text(stringResource(R.string.welcome_safety), color = Color(0xFF8FA2BD),
+                Text(stringResource(R.string.welcome_safety), color = KoiColors.Muted,
                     fontSize = 10.sp, textAlign = TextAlign.Center)
             }
         }
@@ -94,67 +90,28 @@ fun WelcomeScreen(
 }
 
 @Composable
-private fun AmbientBackground(modifier: Modifier) {
-    Canvas(modifier) {
-        drawCircle(Brush.radialGradient(listOf(Color(0xFFC9E1FF).copy(alpha = 0.85f),
-            Color(0xFFC9E1FF).copy(alpha = 0f)), center = Offset(size.width, size.height * 0.25f),
-            radius = size.width * 0.34f), size.width * 0.34f,
-            Offset(size.width, size.height * 0.25f))
-        drawCircle(Brush.radialGradient(listOf(Color(0xFF9CF5E4).copy(alpha = 0.9f),
-            Color(0xFF9CF5E4).copy(alpha = 0f)), center = Offset(-12.dp.toPx(), size.height * 0.43f),
-            radius = 78.dp.toPx()), 78.dp.toPx(), Offset(-12.dp.toPx(), size.height * 0.43f))
-    }
-}
-
-@Composable
-private fun PhoneIllustration(modifier: Modifier = Modifier) {
+private fun PondIllustration(modifier: Modifier = Modifier) {
     Box(modifier, contentAlignment = Alignment.Center) {
-        Box(
-            Modifier.offset(y = 1.dp).rotate(-4.5f).size(180.dp, 246.dp)
-                .shadow(25.dp, RoundedCornerShape(36.dp),
-                    ambientColor = Color(0xFF719AC7).copy(alpha = 0.3f),
-                    spotColor = Color(0xFF719AC7).copy(alpha = 0.3f))
-                .background(Color(0xFF192855), RoundedCornerShape(36.dp)).padding(7.dp)
-                .clip(RoundedCornerShape(29.dp))
-                .background(Brush.linearGradient(listOf(Color(0xFF2666EE), Color(0xFF10796F))))
+        KoiPond(Modifier.fillMaxSize().clip(RoundedCornerShape(36.dp)))
+        Surface(
+            modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+            shape = RoundedCornerShape(20.dp), color = KoiColors.Surface,
+            shadowElevation = 6.dp,
+            border = androidx.compose.foundation.BorderStroke(1.dp, KoiColors.Outline)
         ) {
-            Box(Modifier.align(Alignment.TopCenter).size(58.dp, 14.dp)
-                .background(Color(0xFF192855), RoundedCornerShape(bottomStart = 13.dp, bottomEnd = 13.dp)))
-            Box(Modifier.align(Alignment.Center).offset(y = 12.dp).size(124.dp, 162.dp)) {
-                Canvas(Modifier.fillMaxSize()) {
-                    drawRoundRect(Color(0xFF9FD8F4), topLeft = Offset(1.dp.toPx(), 1.dp.toPx()),
-                        size = Size(size.width - 2.dp.toPx(), size.height - 2.dp.toPx()),
-                        cornerRadius = CornerRadius(23.dp.toPx()),
-                        style = Stroke(1.7.dp.toPx(), pathEffect = PathEffect.dashPathEffect(
-                            floatArrayOf(6.dp.toPx(), 4.dp.toPx()))))
-                }
-                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                    LineIcon(Glyph.Camera, Color.White, Modifier.size(36.dp))
-                    Spacer(Modifier.height(18.dp))
-                    Text(stringResource(R.string.welcome_camera_caption), color = Color.White,
-                        fontSize = 12.sp, fontWeight = FontWeight.Bold, lineHeight = 17.sp,
-                        textAlign = TextAlign.Center)
-                }
-            }
-        }
-        Surface(modifier = Modifier.align(Alignment.TopStart).offset(x = 4.dp, y = 49.dp),
-            shape = RoundedCornerShape(14.dp), color = Color.White,
-            shadowElevation = 15.dp, border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDEEBFF))) {
-            Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
-                Text(stringResource(R.string.welcome_hello), color = Ink, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                Spacer(Modifier.height(3.dp))
-                Text(stringResource(R.string.welcome_translation), color = Muted, fontSize = 10.sp)
-            }
-        }
-        Surface(modifier = Modifier.align(Alignment.BottomEnd).offset(y = (-53).dp),
-            shape = RoundedCornerShape(14.dp), color = Color.White,
-            shadowElevation = 15.dp, border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDEEBFF))) {
-            Row(Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                LineIcon(Glyph.Sound, Blue, Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.welcome_pronunciation), color = Ink,
-                    fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Box(Modifier.size(38.dp).background(KoiColors.SoftWater, RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center) {
+                    LineIcon(Glyph.Camera, KoiColors.Primary, Modifier.size(22.dp))
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.welcome_pond_title), color = KoiColors.Ink,
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.welcome_pond_caption), color = KoiColors.Muted,
+                        fontSize = 11.sp)
+                }
             }
         }
     }

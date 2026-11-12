@@ -8,5 +8,7 @@ data class VocabularyWord(
     val english: String,
     val phonetic: String,
     val meaning: String,
-    val category: VocabularyCategory
+    val category: VocabularyCategory,
+    val partOfSpeech: String? = null,
+    val exampleSentence: String? = null
 )
