@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="collection_edit_title">Sửa bộ sưu tập</string>
+    <string name="collection_editor_subtitle">Gom những từ bạn yêu thích, nuôi dưỡng vốn từ mỗi ngày.</string>
+    <string name="collection_name_placeholder">Ví dụ: Giao tiếp mỗi ngày</string>
+    <string name="collection_description_placeholder">Bạn muốn học gì từ bộ sưu tập này?</string>
+    <string name="collection_delete_subtitle">Dọn gọn bộ sưu tập, giữ nguyên kho từ của bạn.</string>
+    <string name="collection_delete_confirm">Xóa bộ này</string>
+    <string name="collection_selected_count">Đã chọn %1$d từ vựng</string>
     <string name="collection_tab_words">Kho từ</string>
     <string name="collection_tab">Bộ sưu tập</string>
     <string name="collection_create">Tạo bộ sưu tập</string>

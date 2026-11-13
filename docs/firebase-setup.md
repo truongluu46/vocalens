@@ -19,7 +19,7 @@ If saving the display name fails after account creation, the app signs out and e
 Login only opens Home after Firebase succeeds. Startup checks Firebase's persisted user, not a saved UI navigation flag.
 Logout signs out of Firebase. Password reset sends Firebase's reset email; passwords are never stored in SavedStateHandle.
 
-This integrates Authentication only. Dashboard and practice content are still demo data, and profile/vocabulary storage remains local. Profile edits do not update the Firebase account email or display name.
+Firebase is used for Authentication only. Application data now uses the fresh ten-table Room database `vocab_lens_app.db`; profile/settings and library data are separated by UID. Dashboard statistics come from local learning records, and lessons start empty. Profile edits do not update the Firebase account email or display name. See `room-storage.md` for persistence APIs and remaining UI work.
 
 ## Verification
 

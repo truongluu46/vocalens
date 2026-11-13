@@ -5,15 +5,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -124,74 +120,4 @@ fun CollectionsScreen(state: CollectionUiState, onEvent: (CollectionEvent) -> Un
         }
     }
     CollectionDialogs(state, onEvent)
-}
-
-@Composable
-private fun CollectionDialogs(state: CollectionUiState, onEvent: (CollectionEvent) -> Unit) {
-    state.editor?.let { editor ->
-        AlertDialog(onDismissRequest = { onEvent(CollectionEvent.DismissEditor) },
-            containerColor = KoiColors.Surface,
-            title = { Text(stringResource(if (editor.id == null) R.string.collection_create else R.string.collection_edit)) },
-            text = {
-                Column(Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(editor.name, { onEvent(CollectionEvent.Name(it)) }, enabled = !state.busy,
-                        label = { Text(stringResource(R.string.collection_name)) },
-                        modifier = Modifier.fillMaxWidth(), singleLine = true, isError = editor.invalid)
-                    OutlinedTextField(editor.description, { onEvent(CollectionEvent.Description(it)) }, enabled = !state.busy,
-                        label = { Text(stringResource(R.string.collection_description)) },
-                        modifier = Modifier.fillMaxWidth(), minLines = 2, maxLines = 4)
-                    if (editor.invalid) Text(stringResource(R.string.collection_validation), color = MaterialTheme.colorScheme.error)
-                    if (state.error) Text(stringResource(R.string.collection_error), color = MaterialTheme.colorScheme.error)
-                }
-            },
-            confirmButton = { TextButton(onClick = { onEvent(CollectionEvent.Save) }, enabled = !state.busy) {
-                Text(stringResource(if (state.busy) R.string.collection_working else R.string.collection_save))
-            } },
-            dismissButton = { TextButton(onClick = { onEvent(CollectionEvent.DismissEditor) }, enabled = !state.busy) {
-                Text(stringResource(R.string.collection_cancel))
-            } })
-    }
-    state.pendingDelete?.let { group ->
-        AlertDialog(onDismissRequest = { onEvent(CollectionEvent.DismissDelete) }, containerColor = KoiColors.Surface,
-            title = { Text(stringResource(R.string.collection_delete)) },
-            text = { Column {
-                Text(stringResource(R.string.collection_delete_body, group.name))
-                if (state.error) Text(stringResource(R.string.collection_error), color = MaterialTheme.colorScheme.error)
-            } },
-            confirmButton = { TextButton(onClick = { onEvent(CollectionEvent.ConfirmDelete) }, enabled = !state.busy) {
-                Text(stringResource(R.string.collection_delete))
-            } }, dismissButton = { TextButton(onClick = { onEvent(CollectionEvent.DismissDelete) }, enabled = !state.busy) {
-                Text(stringResource(R.string.collection_cancel))
-            } })
-    }
-    state.pickedWordIds?.let { picked ->
-        AlertDialog(onDismissRequest = { onEvent(CollectionEvent.DismissPicker) }, containerColor = KoiColors.Surface,
-            title = { Text(stringResource(R.string.collection_manage_words)) },
-            text = { Column {
-                Text(stringResource(R.string.collection_picker_hint), color = KoiColors.Muted)
-                if (state.availableWords.isEmpty()) Text(stringResource(R.string.collection_no_saved_words),
-                    modifier = Modifier.padding(top = 12.dp))
-                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 320.dp)) {
-                    items(state.availableWords, key = { it.id }) { word ->
-                        Row(Modifier.fillMaxWidth().toggleable(word.id in picked, enabled = !state.busy,
-                            role = Role.Checkbox, onValueChange = { onEvent(CollectionEvent.ToggleWord(word.id)) })
-                            .padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(checked = word.id in picked, onCheckedChange = null, enabled = !state.busy)
-                            Spacer(Modifier.width(10.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(word.english, fontWeight = FontWeight.SemiBold)
-                                Text(word.meaning, color = KoiColors.Muted, fontSize = 12.sp)
-                            }
-                        }
-                    }
-                }
-                if (state.error) Text(stringResource(R.string.collection_error), color = MaterialTheme.colorScheme.error)
-            } },
-            confirmButton = { TextButton(onClick = { onEvent(CollectionEvent.SaveWords) }, enabled = !state.busy) {
-                Text(stringResource(if (state.busy) R.string.collection_working else R.string.collection_save))
-            } }, dismissButton = { TextButton(onClick = { onEvent(CollectionEvent.DismissPicker) }, enabled = !state.busy) {
-                Text(stringResource(R.string.collection_cancel))
-            } })
-    }
 }
