@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_title">Camera VocabLens</string>
+    <string name="camera_back">Quay lại trang chủ</string>
+    <string name="camera_permission_message">Cho phép VocabLens sử dụng camera để xem trực tiếp ngay trong ứng dụng.</string>
+    <string name="camera_grant_permission">Cho phép camera</string>
+    <string name="camera_settings">Mở cài đặt quyền</string>
+    <string name="camera_error">Không thể mở camera. Hãy kiểm tra quyền truy cập và đảm bảo camera không bị ứng dụng khác sử dụng.</string>
+    <string name="camera_retry">Thử lại</string>
+    <string name="camera_switch">Đổi camera</string>
+    <string name="camera_hint">Hướng camera vào vật bạn muốn quan sát</string>
+</resources>

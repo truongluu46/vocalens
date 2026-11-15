@@ -9,6 +9,7 @@ import com.luudev.vocalens.domain.usecase.DeleteCollection
 import com.luudev.vocalens.domain.usecase.SetCollectionWords
 import com.luudev.vocalens.domain.usecase.RemoveCollectionWord
 import android.os.Bundle
+import com.luudev.vocalens.presentation.camera.CameraViewModel
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -68,6 +69,7 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
         )
         val viewModel = ViewModelProvider(this)[WelcomeViewModel::class.java]
+        val cameraViewModel = ViewModelProvider(this)[CameraViewModel::class.java]
         val database = VocabLensDatabase.getInstance(applicationContext)
         val statistics = LocalLearningStatistics(database.statisticsDao(), database.studyDao())
         val synchronizeLocalUser = SynchronizeLocalUser(LocalUserRepositoryImpl(database.userDao()))
@@ -168,6 +170,7 @@ class MainActivity : ComponentActivity() {
                         onDismissHomeAction = homeViewModel::onDismissAction,
                         vocabularyViewModel = vocabularyViewModel,
                         collectionViewModel = collectionViewModel,
+                        cameraViewModel = cameraViewModel,
                         practiceViewModel = practiceViewModel,
                         profileViewModel = profileViewModel,
                         onLogoutConfirmed = {
