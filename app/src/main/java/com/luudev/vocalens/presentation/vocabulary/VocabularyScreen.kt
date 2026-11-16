@@ -59,9 +59,6 @@ fun VocabularyScreen(
     onDeleteConfirmed: () -> Unit,
     onDeleteDismissed: () -> Unit,
     onStartReview: () -> Unit,
-    onRevealMeaning: () -> Unit,
-    onNextReviewWord: () -> Unit,
-    onDismissReview: () -> Unit,
     modifier: Modifier = Modifier,
     onLookup: () -> Unit = {},
     onSaveLookupWord: (VocabularyWord) -> Unit = {}
@@ -184,28 +181,7 @@ fun VocabularyScreen(
             dismissButton = { TextButton(onClick = onDeleteDismissed) { Text(stringResource(R.string.vocabulary_cancel)) } },
             containerColor = KoiColors.Surface)
     }
-    uiState.reviewWords.getOrNull(uiState.reviewIndex)?.let { word ->
-        AlertDialog(onDismissRequest = onDismissReview, containerColor = KoiColors.Surface,
-            title = { Text(stringResource(R.string.vocabulary_review_index, uiState.reviewIndex + 1, uiState.reviewWords.size), fontSize = 17.sp) },
-            text = {
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(word.english, fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Ink)
-                    Spacer(Modifier.height(8.dp))
-                    Text(word.phonetic, color = Muted)
-                    IconButton(onClick = { onSpeakWord(word) }) {
-                        AppIcon(AppGlyph.Sound, Blue, description = stringResource(R.string.vocabulary_pronounce, word.english))
-                    }
-                    if (uiState.meaningRevealed) Text(word.meaning, color = Blue, fontSize = 20.sp)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = if (uiState.meaningRevealed) onNextReviewWord else onRevealMeaning) {
-                    Text(stringResource(if (!uiState.meaningRevealed) R.string.vocabulary_reveal
-                        else if (uiState.reviewIndex == uiState.reviewWords.lastIndex) R.string.vocabulary_finish
-                        else R.string.vocabulary_next), color = Blue)
-                }
-            }, dismissButton = { TextButton(onClick = onDismissReview) { Text(stringResource(R.string.vocabulary_close_review)) } })
-    }
+
 }
 
 @Composable
@@ -289,6 +265,6 @@ private fun VocabularyScreenPreview() {
     val words = listOf(VocabularyWord("headphones", "Headphones", "/ˈhed.fəʊnz/", "Tai nghe", VocabularyCategory.Technology),
         VocabularyWord("notebook", "Notebook", "/ˈnəʊt.bʊk/", "Sổ ghi chép", VocabularyCategory.Objects))
     VocaLensTheme(darkTheme = false, dynamicColor = false) {
-        VocabularyScreen(VocabularyUiState(savedWords = words, visibleWords = words), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+        VocabularyScreen(VocabularyUiState(savedWords = words, visibleWords = words), {}, {}, {}, {}, {}, {}, {}, {}, {})
     }
 }

@@ -1,6 +1,8 @@
 package com.luudev.vocalens.presentation.navigation
 
 import com.luudev.vocalens.presentation.theme.KoiColors
+import com.luudev.vocalens.presentation.flashcard.FlashcardRoute
+import com.luudev.vocalens.presentation.flashcard.FlashcardViewModel
 import androidx.activity.compose.BackHandler
 import com.luudev.vocalens.presentation.camera.CameraRoute
 import com.luudev.vocalens.presentation.camera.CameraViewModel
@@ -33,6 +35,7 @@ fun MainNavigation(
     onDismissHomeAction: () -> Unit,
     vocabularyViewModel: VocabularyViewModel,
     collectionViewModel: CollectionViewModel,
+    flashcardViewModel: FlashcardViewModel,
     cameraViewModel: CameraViewModel,
     practiceViewModel: PracticeViewModel,
     profileViewModel: ProfileViewModel,
@@ -40,6 +43,7 @@ fun MainNavigation(
     modifier: Modifier = Modifier
 ) {
     var destination by rememberSaveable { mutableStateOf(MainDestination.Home) }
+    var flashcardOrigin by rememberSaveable { mutableStateOf(MainDestination.Home) }
     val stateHolder = rememberSaveableStateHolder()
 
     BackHandler(enabled = destination != MainDestination.Home) {
@@ -51,9 +55,11 @@ fun MainNavigation(
         containerColor = if (destination == MainDestination.Profile) KoiColors.DeepWater else KoiColors.Mint,
         contentWindowInsets = WindowInsets.safeDrawing,
         bottomBar = {
-            BottomNavigationBar(destination.tab, onTabSelected = { tab ->
-                destination = MainDestination.fromTab(tab)
-            })
+            if (destination != MainDestination.Flashcards) {
+                BottomNavigationBar(destination.tab, onTabSelected = { tab ->
+                    destination = MainDestination.fromTab(tab)
+                })
+            }
         }
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) {
@@ -64,15 +70,29 @@ fun MainNavigation(
                         when (action) {
                             HomeAction.Camera -> destination = MainDestination.Camera
                             HomeAction.Profile -> destination = MainDestination.Profile
-                            HomeAction.Vocabulary, HomeAction.Flashcards -> destination = MainDestination.Vocabulary
+                            HomeAction.Vocabulary -> destination = MainDestination.Vocabulary
+                            HomeAction.Flashcards -> {
+                                flashcardViewModel.prepare()
+                                flashcardOrigin = MainDestination.Home
+                                destination = MainDestination.Flashcards
+                            }
                             HomeAction.Practice, HomeAction.Listening -> destination = MainDestination.Practice
                             else -> onHomeAction(action)
                         }
                     }, onDismissAction = onDismissHomeAction)
                     MainDestination.Vocabulary -> VocabularyRoute(vocabularyViewModel, collectionViewModel,
+                        onStartFlashcards = {
+                            flashcardViewModel.prepare(vocabularyViewModel.uiState.category)
+                            flashcardOrigin = MainDestination.Vocabulary
+                            destination = MainDestination.Flashcards
+                        },
                         soundEnabled = profileViewModel.uiState.profile.soundEnabled) {
                         destination = MainDestination.Home
                     }
+                    MainDestination.Flashcards -> FlashcardRoute(flashcardViewModel,
+                        soundEnabled = profileViewModel.uiState.profile.soundEnabled,
+                        onBack = { destination = flashcardOrigin },
+                        onOpenVocabulary = { destination = MainDestination.Vocabulary })
                     MainDestination.Practice -> PracticeScreen(
                         uiState = practiceViewModel.uiState,
                         onBackClick = { destination = MainDestination.Home },

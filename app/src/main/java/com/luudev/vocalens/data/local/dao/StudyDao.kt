@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class StudyDao {
+    @Query("SELECT * FROM study_sessions WHERE userId = :uid AND status = 'ACTIVE' AND sessionType = 'VOCAB_REVIEW'")
+    abstract suspend fun activeVocabularySessions(uid: String): List<StudySessionEntity>
     @Query("SELECT * FROM study_sessions WHERE userId = :uid ORDER BY startedAt DESC")
     abstract fun observeSessions(uid: String): Flow<List<StudySessionEntity>>
     @Query("SELECT * FROM vocabulary_reviews WHERE userId = :uid ORDER BY reviewedAt DESC")

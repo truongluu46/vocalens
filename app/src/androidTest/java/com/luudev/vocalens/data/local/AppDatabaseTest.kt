@@ -122,6 +122,41 @@ class AppDatabaseTest {
         assertTrue(db.studyDao().observeReviews("B").first().isEmpty())
     }
 
+    @Test fun flashcardCompletionAndRetrySaveOneReviewAndAwardXpOnce() = runBlocking {
+        save()
+        val repository = LocalFlashcardRepositoryImpl(db)
+        repository.start("A", "flash", 1000)
+        val event = FlashcardReview("flash", "book", FlashcardRating.GOOD, 2000, 1000, 1000, true, 5)
+        repository.review("A", event)
+        repository.review("A", event)
+        assertEquals(1, db.studyDao().observeReviews("A").first().size)
+        assertEquals("SELF_RATED", db.studyDao().observeReviews("A").first().single().reviewMode)
+        val session = db.studyDao().session("A", "flash")!!
+        assertEquals("COMPLETED", session.status)
+        assertEquals(5, session.earnedXp)
+        val stats = LocalLearningStatistics(db.statisticsDao(), db.studyDao()).observe("A").first()
+        assertEquals(5, stats.totalXp)
+        assertEquals(0, LocalLearningStatistics(db.statisticsDao(), db.studyDao()).observe("B").first().totalXp)
+    }
+
+    @Test fun flashcardInvalidCompletionRollsBackReviewAndInterruptedSessionCanRestart() = runBlocking {
+        save()
+        val repository = LocalFlashcardRepositoryImpl(db)
+        repository.start("A", "old", 1000)
+        val event = FlashcardReview("old", "book", FlashcardRating.HARD, 2000, 1000, 1000, true, -1)
+        mustFail { repository.review("A", event) }
+        assertTrue(db.studyDao().observeReviews("A").first().isEmpty())
+        assertEquals("ACTIVE", db.studyDao().session("A", "old")!!.status)
+        repository.review("A", event.copy(completed = false, earnedXp = 0))
+        repository.start("A", "new", 3000)
+        assertEquals("ABANDONED", db.studyDao().session("A", "old")!!.status)
+        assertEquals(0, db.studyDao().session("A", "old")!!.earnedXp)
+        assertEquals(1, db.studyDao().observeReviews("A").first().size)
+        assertEquals("ACTIVE", db.studyDao().session("A", "new")!!.status)
+        repository.abandon("A", "new", 4000, 1000)
+        assertEquals("ABANDONED", db.studyDao().session("A", "new")!!.status)
+    }
+
     @Test fun sessionsRejectOverlapAndInvalidAccounting() = runBlocking {
         start()
         mustFail { start(id = "second", at = 2000) }

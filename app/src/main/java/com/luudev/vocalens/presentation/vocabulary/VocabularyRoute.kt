@@ -34,6 +34,7 @@ import java.util.Locale
 /** Owns device speech and lifecycle; form and list state remain in the ViewModel. */
 @Composable
 fun VocabularyRoute(viewModel: VocabularyViewModel, collectionViewModel: CollectionViewModel,
+    onStartFlashcards: () -> Unit,
     soundEnabled: Boolean = true, onBackClick: () -> Unit) {
     val context = LocalContext.current.applicationContext
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -133,10 +134,7 @@ fun VocabularyRoute(viewModel: VocabularyViewModel, collectionViewModel: Collect
                 onDeleteRequested = viewModel::onDeleteRequested,
                 onDeleteConfirmed = viewModel::onDeleteConfirmed,
                 onDeleteDismissed = viewModel::onDeleteDismissed,
-                onStartReview = viewModel::onStartReview,
-                onRevealMeaning = viewModel::onRevealMeaning,
-                onNextReviewWord = viewModel::onNextReviewWord,
-                onDismissReview = viewModel::onDismissReview
+                onStartReview = onStartFlashcards
             )
         }
         SnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter).padding(16.dp))

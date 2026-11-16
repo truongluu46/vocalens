@@ -9,6 +9,11 @@ import com.luudev.vocalens.domain.usecase.DeleteCollection
 import com.luudev.vocalens.domain.usecase.SetCollectionWords
 import com.luudev.vocalens.domain.usecase.RemoveCollectionWord
 import android.os.Bundle
+import com.luudev.vocalens.data.repository.LocalFlashcardRepositoryImpl
+import com.luudev.vocalens.domain.usecase.StartFlashcards
+import com.luudev.vocalens.domain.usecase.RateFlashcard
+import com.luudev.vocalens.domain.usecase.AbandonFlashcards
+import com.luudev.vocalens.presentation.flashcard.FlashcardViewModel
 import com.luudev.vocalens.presentation.camera.CameraViewModel
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -102,6 +107,13 @@ class MainActivity : ComponentActivity() {
                     RemoveCollectionWord(repository), GetSavedVocabulary(LocalVocabularyRepositoryImpl(database.vocabularyDao())))
             }
         })[CollectionViewModel::class.java]
+        val flashcardViewModel = ViewModelProvider(this, viewModelFactory {
+            initializer {
+                val repository = LocalFlashcardRepositoryImpl(database)
+                FlashcardViewModel(GetSavedVocabulary(LocalVocabularyRepositoryImpl(database.vocabularyDao())),
+                    StartFlashcards(repository), RateFlashcard(repository), AbandonFlashcards(repository))
+            }
+        })[FlashcardViewModel::class.java]
         val practiceViewModel = ViewModelProvider(this, viewModelFactory {
             initializer { PracticeViewModel(createSavedStateHandle(), GetPracticeLessons(LocalPracticeRepositoryImpl(database.lessonDao()))) }
         })[PracticeViewModel::class.java]
@@ -122,6 +134,7 @@ class MainActivity : ComponentActivity() {
                     sessionError = false
                     vocabularyViewModel.onUserChanged(null)
                     collectionViewModel.onUserChanged(null)
+                    if (user == null) flashcardViewModel.onUserChanged(null)
                     profileViewModel.onUserChanged(null)
                     practiceViewModel.onUserChanged(null)
                     homeViewModel.onUserChanged(null)
@@ -130,6 +143,7 @@ class MainActivity : ComponentActivity() {
                             synchronizeLocalUser(user)
                             vocabularyViewModel.onUserChanged(user.uid)
                             collectionViewModel.onUserChanged(user.uid)
+                            flashcardViewModel.onUserChanged(user.uid)
                             profileViewModel.onUserChanged(user.uid)
                             practiceViewModel.onUserChanged(user.uid)
                             homeViewModel.onUserChanged(user.uid)
@@ -170,12 +184,14 @@ class MainActivity : ComponentActivity() {
                         onDismissHomeAction = homeViewModel::onDismissAction,
                         vocabularyViewModel = vocabularyViewModel,
                         collectionViewModel = collectionViewModel,
+                        flashcardViewModel = flashcardViewModel,
                         cameraViewModel = cameraViewModel,
                         practiceViewModel = practiceViewModel,
                         profileViewModel = profileViewModel,
                         onLogoutConfirmed = {
                             vocabularyViewModel.onUserChanged(null)
                             collectionViewModel.onUserChanged(null)
+                            flashcardViewModel.onUserChanged(null)
                             profileViewModel.onUserChanged(null)
                             practiceViewModel.onUserChanged(null)
                             homeViewModel.onUserChanged(null)

@@ -142,30 +142,6 @@ class RoomVocabularyViewModelTest {
         assertEquals(listOf(notebook), restored.uiState.visibleWords)
     }
 
-    @Test fun reviewUsesFilteredWordsAndFinishesAfterLastCard() = runTest {
-        val vm = viewModel(repository())
-        runCurrent()
-        vm.onCategorySelected(VocabularyCategory.Objects)
-        vm.onStartReview()
-        assertEquals(listOf(notebook), vm.uiState.reviewWords)
-        vm.onRevealMeaning()
-        assertTrue(vm.uiState.meaningRevealed)
-        vm.onNextReviewWord()
-        assertTrue(vm.uiState.reviewWords.isEmpty())
-    }
-
-    @Test fun advancingReviewHidesMeaningAndCancelClosesSession() = runTest {
-        val vm = viewModel(repository())
-        runCurrent()
-        vm.onStartReview()
-        vm.onRevealMeaning()
-        vm.onNextReviewWord()
-        assertEquals(1, vm.uiState.reviewIndex)
-        assertFalse(vm.uiState.meaningRevealed)
-        vm.onDismissReview()
-        assertTrue(vm.uiState.reviewWords.isEmpty())
-    }
-
     @Test fun deletingLastWordLeavesEmptyBank() = runTest {
         val repo = repository().apply { words("A").value = listOf(headphones) }
         val vm = viewModel(repo)
@@ -176,15 +152,13 @@ class RoomVocabularyViewModelTest {
         assertTrue(vm.uiState.savedWords.isEmpty())
     }
 
-    @Test fun switchingAccountsImmediatelyClearsOldWordsReviewAndFilters() = runTest {
+    @Test fun switchingAccountsImmediatelyClearsOldWordsAndFilters() = runTest {
         val repo = repository().apply { words("B").value = listOf(notebook) }
         val vm = viewModel(repo)
         runCurrent()
         vm.onQueryChange("head")
-        vm.onStartReview()
         vm.onUserChanged("B")
         assertTrue(vm.uiState.savedWords.isEmpty())
-        assertTrue(vm.uiState.reviewWords.isEmpty())
         assertEquals("", vm.uiState.query)
         runCurrent()
         assertEquals(listOf(notebook), vm.uiState.savedWords)

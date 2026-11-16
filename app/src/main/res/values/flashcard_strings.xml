@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="flashcard_title">Flashcards</string>
+    <string name="flashcard_intro">Ôn từ đã lưu cùng VocabLens. Thử nhớ đáp án trước khi lật thẻ.</string>
+    <string name="flashcard_count">%1$d thẻ để ôn</string>
+    <string name="flashcard_shuffle">Trộn thứ tự thẻ</string>
+    <string name="flashcard_reverse">Xem nghĩa trước, nhớ từ tiếng Anh</string>
+    <string name="flashcard_start">Bắt đầu ôn tập</string>
+    <string name="flashcard_empty">Chưa có từ trong nhóm này. Hãy lưu thêm từ để bắt đầu.</string>
+    <string name="flashcard_add_words">Mở sổ từ vựng</string>
+    <string name="flashcard_tap">Chạm thẻ để xem đáp án</string>
+    <string name="flashcard_reveal">Lật thẻ</string>
+    <string name="flashcard_rate">Bạn nhớ từ này ở mức nào?</string>
+    <string name="flashcard_again">Chưa nhớ</string>
+    <string name="flashcard_hard">Khó nhớ</string>
+    <string name="flashcard_good">Đã nhớ</string>
+    <string name="flashcard_easy">Dễ dàng</string>
+    <string name="flashcard_completed">Hoàn thành lượt ôn!</string>
+    <string name="flashcard_result">Đã nhớ %1$d / %2$d từ</string>
+    <string name="flashcard_xp">+%1$d XP đã được lưu</string>
+    <string name="flashcard_repeat_difficult">Ôn lại từ chưa nhớ và khó nhớ</string>
+    <string name="flashcard_new_round">Chọn lượt ôn mới</string>
+    <string name="flashcard_exit_title">Dừng lượt ôn?</string>
+    <string name="flashcard_exit_body">Các thẻ đã đánh giá vẫn được lưu trong lịch sử. Bạn chỉ nhận XP khi hoàn thành lượt ôn.</string>
+    <string name="flashcard_exit">Dừng ôn</string>
+    <string name="flashcard_continue">Tiếp tục học</string>
+    <string name="flashcard_error">Không thể đọc hoặc lưu dữ liệu ôn tập. Vui lòng thử lại.</string>
+</resources>

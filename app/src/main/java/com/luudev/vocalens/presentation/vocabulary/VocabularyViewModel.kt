@@ -28,9 +28,6 @@ data class VocabularyUiState(
     val category: VocabularyCategory? = null,
     val sort: VocabularySort = VocabularySort.RecentlySaved,
     val pendingDeletion: VocabularyWord? = null,
-    val reviewWords: List<VocabularyWord> = emptyList(),
-    val reviewIndex: Int = 0,
-    val meaningRevealed: Boolean = false,
     val storageError: Boolean = false,
     val lookupResults: List<DictionaryEntry> = emptyList(),
     val lookupLoading: Boolean = false,
@@ -76,8 +73,7 @@ class VocabularyViewModel(
         }
         savedStateHandle[OWNER] = next
         uiState = if (sameOwner) uiState.copy(savedWords = emptyList(), visibleWords = emptyList(),
-            pendingDeletion = null, reviewWords = emptyList(), reviewIndex = 0,
-            meaningRevealed = false, storageError = false, lookupResults = emptyList(),
+            pendingDeletion = null, storageError = false, lookupResults = emptyList(),
             lookupLoading = false, lookupError = null, savingWordId = null) else VocabularyUiState()
         if (next == null) return
         wordsJob = viewModelScope.launch {
@@ -167,19 +163,6 @@ class VocabularyViewModel(
             }
         }
     }
-
-    fun onStartReview() {
-        uiState = uiState.copy(reviewWords = uiState.visibleWords.toList(), reviewIndex = 0, meaningRevealed = false)
-    }
-
-    fun onRevealMeaning() { uiState = uiState.copy(meaningRevealed = true) }
-
-    fun onNextReviewWord() {
-        if (uiState.reviewIndex + 1 >= uiState.reviewWords.size) onDismissReview()
-        else uiState = uiState.copy(reviewIndex = uiState.reviewIndex + 1, meaningRevealed = false)
-    }
-
-    fun onDismissReview() { uiState = uiState.copy(reviewWords = emptyList(), reviewIndex = 0, meaningRevealed = false) }
 
     private fun updateVisibleWords() {
         uiState = uiState.copy(visibleWords = filterVocabulary(uiState.savedWords, "", uiState.category, uiState.sort))
