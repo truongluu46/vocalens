@@ -19,6 +19,8 @@ abstract class CollectionDao {
     @Query("""UPDATE collections SET name = :name, description = :description, updatedAt = :now
         WHERE userId = :uid AND collectionId = :id""")
     abstract suspend fun update(uid: String, id: String, name: String, description: String, now: Long): Int
+    @Query("UPDATE collections SET updatedAt = :now WHERE userId = :uid AND collectionId = :id")
+    abstract suspend fun touch(uid: String, id: String, now: Long): Int
     @Query("SELECT EXISTS(SELECT 1 FROM collections WHERE userId = :uid AND collectionId = :id)")
     protected abstract suspend fun exists(uid: String, id: String): Boolean
     @Query("DELETE FROM collection_items WHERE userId = :uid AND collectionId = :id")

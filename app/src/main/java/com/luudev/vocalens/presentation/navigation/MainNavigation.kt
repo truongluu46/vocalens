@@ -6,6 +6,8 @@ import com.luudev.vocalens.presentation.flashcard.FlashcardViewModel
 import androidx.activity.compose.BackHandler
 import com.luudev.vocalens.presentation.camera.CameraRoute
 import com.luudev.vocalens.presentation.camera.CameraViewModel
+import com.luudev.vocalens.presentation.camera.CameraWordViewModel
+import com.luudev.vocalens.presentation.camera.CameraWordDialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -37,6 +39,7 @@ fun MainNavigation(
     collectionViewModel: CollectionViewModel,
     flashcardViewModel: FlashcardViewModel,
     cameraViewModel: CameraViewModel,
+    cameraWordViewModel: CameraWordViewModel,
     practiceViewModel: PracticeViewModel,
     profileViewModel: ProfileViewModel,
     onLogoutConfirmed: () -> Unit,
@@ -119,7 +122,9 @@ fun MainNavigation(
                         onSoundChanged = profileViewModel::onSoundChanged,
                         onLogoutConfirmed = onLogoutConfirmed
                     )
-                    MainDestination.Camera -> CameraRoute(cameraViewModel) {
+                    MainDestination.Camera -> CameraRoute(cameraViewModel,
+                        onWordSelected = cameraWordViewModel::selectWord,
+                        wordEditor = { CameraWordDialog(cameraWordViewModel) }) {
                         destination = MainDestination.Home
                     }
                 }

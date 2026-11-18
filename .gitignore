@@ -47,3 +47,4 @@ Desktop.ini
 # Local documents and agent instructions
 *.docx
 [Aa][Gg][Ee][Nn][Tt][Ss].[Mm][Dd]
+/docs/

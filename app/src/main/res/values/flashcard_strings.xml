@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="flashcard_title">Flashcards</string>
-    <string name="flashcard_intro">Ôn từ đã lưu cùng VocabLens. Thử nhớ đáp án trước khi lật thẻ.</string>
+    <string name="flashcard_intro">Nhớ lại đáp án, lật thẻ rồi chọn mức độ ghi nhớ. Mỗi thẻ là một bước tiến nhỏ.</string>
     <string name="flashcard_count">%1$d thẻ để ôn</string>
     <string name="flashcard_shuffle">Trộn thứ tự thẻ</string>
-    <string name="flashcard_reverse">Xem nghĩa trước, nhớ từ tiếng Anh</string>
+    <string name="flashcard_reverse">Đoán từ tiếng Anh</string>
     <string name="flashcard_start">Bắt đầu ôn tập</string>
     <string name="flashcard_empty">Chưa có từ trong nhóm này. Hãy lưu thêm từ để bắt đầu.</string>
     <string name="flashcard_add_words">Mở sổ từ vựng</string>
@@ -25,4 +25,32 @@
     <string name="flashcard_exit">Dừng ôn</string>
     <string name="flashcard_continue">Tiếp tục học</string>
     <string name="flashcard_error">Không thể đọc hoặc lưu dữ liệu ôn tập. Vui lòng thử lại.</string>
+    <string name="flashcard_back">Quay lại</string>
+    <string name="flashcard_setup_subtitle">Một chút mỗi ngày, nhớ lâu hơn</string>
+    <string name="flashcard_study_subtitle">Tập trung vào từng từ</string>
+    <string name="flashcard_result_subtitle">Nhìn lại lượt ôn của bạn</string>
+    <string name="flashcard_setup_title">Sẵn sàng ôn từ?</string>
+    <string name="flashcard_choose_group">Bạn muốn ôn nhóm nào?</string>
+    <string name="flashcard_group_count">%1$d thẻ</string>
+    <string name="flashcard_options">Cách ôn tập</string>
+    <string name="flashcard_shuffle_hint">Đổi thứ tự để tránh học thuộc vị trí</string>
+    <string name="flashcard_reverse_hint">Xem nghĩa tiếng Việt và nhớ lại từ tiếng Anh</string>
+    <string name="flashcard_position">Thẻ %1$d / %2$d</string>
+    <string name="flashcard_reviewed">Đã ôn %1$d</string>
+    <string name="flashcard_meaning_face">NGHĨA TIẾNG VIỆT</string>
+    <string name="flashcard_english_face">TỪ TIẾNG ANH</string>
+    <string name="flashcard_answer">ĐÁP ÁN</string>
+    <string name="flashcard_example">Ví dụ sử dụng</string>
+    <string name="flashcard_think">Bạn có nhớ đáp án không?</string>
+    <string name="flashcard_listen">Nghe phát âm</string>
+    <string name="flashcard_reveal_hint">Thử nhớ trước khi xem đáp án</string>
+    <string name="flashcard_saving">Đang lưu kết quả…</string>
+    <string name="flashcard_again_hint">Cần học lại từ này</string>
+    <string name="flashcard_hard_hint">Cần gợi ý mới nhớ</string>
+    <string name="flashcard_good_hint">Nhớ sau khi suy nghĩ</string>
+    <string name="flashcard_easy_hint">Nhớ ngay lập tức</string>
+    <string name="flashcard_repeat_count">Ôn lại %1$d từ cần luyện</string>
+    <string name="flashcard_all_remembered">Bạn đã nhớ tất cả các từ trong lượt này. Hãy tiếp tục giữ nhịp học nhé!</string>
+    <string name="flashcard_encouragement">Mỗi lần ôn là một lần nhớ lâu hơn. Thử lại những từ cần luyện nhé!</string>
+    <string name="flashcard_breakdown">Mức độ ghi nhớ</string>
 </resources>

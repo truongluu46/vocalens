@@ -7,9 +7,9 @@
     <string name="welcome_pronunciation">/ˈvɪʒ.ən/</string>
     <string name="welcome_camera_caption">AI đang học cùng\nbạn</string>
     <string name="welcome_eyebrow">HỌC TIẾNG ANH THÔNG MINH</string>
-    <string name="welcome_title">Nhìn thế giới</string>
-    <string name="welcome_title_accent">Học tiếng Anh</string>
-    <string name="welcome_description">Biến mọi đồ vật xung quanh thành một bài học thú vị với sức mạnh của AI.</string>
+    <string name="welcome_title">Nhìn quanh,</string>
+    <string name="welcome_title_accent">học từ mới</string>
+    <string name="welcome_description">Học tiếng Anh từ mọi điều quanh bạn.</string>
     <string name="welcome_start">Bắt đầu</string>
-    <string name="welcome_safety">Prototype học tập an toàn và miễn phí</string>
+    <string name="welcome_safety">.</string>
 </resources>

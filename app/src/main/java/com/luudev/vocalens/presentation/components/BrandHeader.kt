@@ -26,7 +26,7 @@ import com.luudev.vocalens.R
 
 @Composable
 @Preview
-fun BrandHeader(modifier: Modifier = Modifier) {
+fun BrandHeader(modifier: Modifier = Modifier, showAiBadge: Boolean = true) {
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(52.dp).shadow(12.dp, RoundedCornerShape(18.dp),
             spotColor = KoiColors.Water).background(
@@ -46,15 +46,18 @@ fun BrandHeader(modifier: Modifier = Modifier) {
                 }
             }
         }
-        Spacer(Modifier.height(13.dp))
+        Spacer(Modifier.height(if (showAiBadge) 13.dp else 8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.welcome_brand), color = KoiColors.Ink,
-                fontSize = 23.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.7).sp)
-            Spacer(Modifier.width(4.dp))
-            Text(stringResource(R.string.welcome_ai), color = KoiColors.Primary, fontSize = 11.sp,
-                fontWeight = FontWeight.Bold, modifier = Modifier
-                    .background(KoiColors.SoftWater, RoundedCornerShape(4.dp))
-                    .padding(horizontal = 3.dp, vertical = 1.dp))
+                fontSize = if (showAiBadge) 23.sp else 20.sp,
+                fontWeight = FontWeight.Bold, letterSpacing = (-0.7).sp)
+            if (showAiBadge) {
+                Spacer(Modifier.width(4.dp))
+                Text(stringResource(R.string.welcome_ai), color = KoiColors.Primary, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold, modifier = Modifier
+                        .background(KoiColors.SoftWater, RoundedCornerShape(4.dp))
+                        .padding(horizontal = 3.dp, vertical = 1.dp))
+            }
         }
     }
 }

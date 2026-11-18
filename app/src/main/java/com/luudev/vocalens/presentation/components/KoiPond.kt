@@ -290,3 +290,67 @@ private fun DrawScope.koi(p: Offset, length: Float, angle: Float, accent: Color,
         }
     }
 }
+
+/** Welcome artwork uses larger fish and an open centre, matching the onboarding composition. */
+@Composable
+fun WelcomePond(modifier: Modifier = Modifier) {
+    val phase = LocalPondPhase.current ?: rememberPondPhase()
+    Canvas(modifier) {
+        drawRect(Brush.radialGradient(
+            listOf(Color(0xFF007573), Color(0xFF24A79A), Color(0xFF7BCFB6)),
+            center = Offset(size.width * .48f, size.height * .56f), radius = size.width * .72f
+        ))
+        val unit = size.width / 363f
+        scale(unit, unit, pivot = Offset.Zero) {
+            val h = size.height / unit
+            fun point(x: Float, y: Float) = Offset(363f * x, h * y)
+            // Broad, faint curves suggest sunlight refracting through the water.
+            repeat(7) { index ->
+                val y = h * (.12f + index * .14f)
+                val wave = Path().apply {
+                    moveTo(-20f, y)
+                    cubicTo(70f, y - 42f, 140f, y + 66f, 228f, y + 12f)
+                    cubicTo(285f, y - 20f, 320f, y + 34f, 390f, y - 8f)
+                }
+                drawPath(wave, Color(0xFFB1F3D7).copy(alpha = .055f), style = Stroke(2f))
+            }
+            repeat(6) { ring ->
+                drawCircle(Color(0xFFB8ECDD).copy(alpha = .18f - ring * .022f),
+                    28f + ring * 15f, point(.49f, .52f), style = Stroke(.8f))
+            }
+            fun stone(x: Float, y: Float, radius: Float, moss: Boolean = false) {
+                val p = point(x, y)
+                drawCircle(Color(0xFF39776A).copy(alpha = .18f), radius, p + Offset(3f, 6f))
+                drawCircle(Brush.linearGradient(listOf(Color(0xFFF8F5E7), Color(0xFFE4E4D3))), radius, p)
+                drawCircle(Color(0xFFFFFCF0).copy(alpha = .85f), radius - 1f, p,
+                    style = Stroke(2f))
+                if (moss) drawCircle(Color(0xFF7EB88D), 8f, p + Offset(radius * .5f, radius * .45f))
+            }
+            stone(.01f, .04f, 39f, true)
+            stone(.14f, -.02f, 37f, true)
+            stone(-.02f, .20f, 30f, true)
+            stone(1.00f, .93f, 40f)
+            stone(.90f, 1.06f, 46f)
+            lily(point(.81f, .19f), 35f)
+            lily(point(.92f, .32f), 22f)
+            lily(point(.75f, .35f), 17f)
+            lily(point(.12f, .76f), 21f)
+            lily(point(.20f, .88f), 35f, flower = true)
+            lily(point(.33f, .94f), 12f)
+            val t = phase.value
+            val positions = listOf(point(.25f, .40f), point(.72f, .23f), point(.74f, .68f))
+            val headings = listOf(32f, -66f, -25f)
+            positions.forEachIndexed { index, anchor ->
+                val p = anchor + Offset(sin(t + index * 2f) * 8f, cos(t + index * 2f) * 6f)
+                repeat(3) { ring ->
+                    drawArc(Color(0xFFC9F4E4).copy(alpha = .20f - ring * .045f),
+                        150f, 100f, false, p - Offset(20f + ring * 6, 18f + ring * 6),
+                        Size(40f + ring * 12, 48f + ring * 12), style = Stroke(.7f))
+                }
+                koi(p, 48f, headings[index] + sin(t * 2f + index) * 7f,
+                    if (index == 1) Color(0xFFFFD867) else Color(0xFFF68D2E),
+                    patterned = index != 1, swish = sin(t * 24f + index))
+            }
+        }
+    }
+}
